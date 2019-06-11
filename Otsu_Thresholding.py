@@ -1,13 +1,14 @@
-import matplotlib.pyplot as plt
-from skimage.io import imread
-from skimage.filters import threshold_otsu
-
 # -*- coding: utf-8 -*-
 """
 Created on Wed May  1 11:08:50 2019
 Global Otsu thresholding
-@author: mostly Luis
+@author: Luis
 """
+
+import matplotlib.pyplot as plt
+from skimage.io import imread
+from skimage.filters import threshold_otsu
+
 
 def import_image(path, name):
     # data/image is found in directory and imported as gray scale image
