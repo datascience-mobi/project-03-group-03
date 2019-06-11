@@ -6,14 +6,14 @@ Global Otsu thresholding
 """
 
 import matplotlib.pyplot as plt
-from skimage.io import imread
-from skimage.filters import threshold_otsu
+import skimage.io
+import skimage.filters
 
 
 def import_image(path, name):
     # data/image is found in directory and imported as gray scale image
-    raw_image_directory = path + name
-    image = imread(raw_image_directory, as_gray=True)
+    raw_image_path = path + name
+    image = skimage.io.imread(raw_image_path, as_gray=True)
     return image
 
 
@@ -44,7 +44,6 @@ def figure(original_image, binary_image, threshold_value):
     ax[2].axis('off')
 
     plt.show()
-    return
 
 
 def main():
@@ -55,7 +54,7 @@ def main():
     # import function was executed and optimal threshold value is determined by skimage
 
     image = import_image(path, name)
-    thresh = threshold_otsu(image)
+    thresh = skimage.filters.threshold_otsu(image)
     # image is binarized(False = black, True = white) and final figure is created
     binary = image > thresh
     figure(image, binary, thresh)
