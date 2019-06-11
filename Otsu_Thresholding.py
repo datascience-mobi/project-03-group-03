@@ -12,36 +12,47 @@ import skimage.filters
 
 def import_image(path, name):
     # data/image is found in directory and imported as gray scale image
-    raw_image_path = path + name
+    raw_image_path = path + "\\" + name
     image = skimage.io.imread(raw_image_path, as_gray=True)
     return image
 
 
-def figure(original_image, binary_image, threshold_value):
-    # figure is created with 3 subplots in one row but 3 columns
-    fig, axes = plt.subplots(ncols=3, figsize=(8, 2.5))
-    ax = axes.ravel()
-
-    # axes 0 is the first subplot of the 1 row/3 column figure at position one
+def original_image_axes(original_image):
+    # original_image_axes creates the first subplot in the first column of the figure.
     # it shows the original image in gray scale. Axis labeling is turned off
-    ax[0] = plt.subplot(1, 3, 1)
-    ax[0].imshow(original_image, cmap=plt.cm.gray)
-    ax[0].set_title('Original')
-    ax[0].axis('off')
+    plt.subplot(1, 3, 1)
 
-    # Histogram of the normalized intensity distribution is created at position two.
+    plt.imshow(original_image, cmap=plt.cm.gray)
+    plt.title('Original')
+    plt.axis('off')
+
+
+def intensity_histogram(original_image, threshold_value):
+    # Histogram of the normalized intensity distribution is created at second column.
     # A line indicating the Otsu threshold was added
-    ax[1] = plt.subplot(1, 3, 2)
-    ax[1].hist(original_image.ravel(), bins=256)
-    ax[1].set_title('Histogram')
-    ax[1].axvline(threshold_value, color='r', label='Threshold Value')
-    ax[1].legend()
+    plt.subplot(1, 3, 2)
+    plt.hist(original_image.ravel(), bins=256)
+    plt.title('Histogram')
+    plt.axvline(threshold_value, color='r', label='Threshold Value')
+    plt.legend()
 
+
+def binary_otsu_image(binary_image):
     # The third subplot is showing the binary image after otsu thresholding. Again the axis labeling is turned off
-    ax[2] = plt.subplot(1, 3, 3, sharex=ax[0], sharey=ax[0])
-    ax[2].imshow(binary_image, cmap=plt.cm.gray)
-    ax[2].set_title('Thresholded')
-    ax[2].axis('off')
+    plt.subplot(1, 3, 3)
+    plt.imshow(binary_image, cmap=plt.cm.gray)
+    plt.title('Thresholded')
+    plt.axis('off')
+
+
+def figure_of_original_histogram_and_otsu(original_image, binary_image, threshold_value):
+    # A figure is created and shown with 3 subplots
+
+    plt.figure(figsize=(8, 2.5))
+
+    original_image_axes(original_image)
+    intensity_histogram(original_image, threshold_value)
+    binary_otsu_image(binary_image)
 
     plt.show()
 
@@ -49,7 +60,7 @@ def figure(original_image, binary_image, threshold_value):
 def main():
     # Directory and image were defined
     name = "jw-1h1_c5.TIF"
-    path = "C:\\Users\\User\\PycharmProjects\\Otsu_thresholding\\"
+    path = "C:\\Users\\User\\PycharmProjects\\Otsu_thresholding"
 
     # import function was executed and optimal threshold value is determined by skimage
 
@@ -57,8 +68,7 @@ def main():
     thresh = skimage.filters.threshold_otsu(image)
     # image is binarized(False = black, True = white) and final figure is created
     binary = image > thresh
-    figure(image, binary, thresh)
-    # print(binary)
+    figure_of_original_histogram_and_otsu(image, binary, thresh)
 
 
 if __name__ == "__main__":
