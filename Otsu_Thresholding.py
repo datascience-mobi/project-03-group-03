@@ -42,16 +42,17 @@ def binary_otsu_image(binary_image):
     # The third subplot is showing the binary image after otsu thresholding. Again the axis labeling is turned off
     plt.subplot(2, 3, 3)
     plt.imshow(binary_image, cmap=plt.cm.gray)
-    plt.title('Thresholded')
+    plt.title('Otsu thresh')
     plt.axis('off')
 
 
 def figure_of_original_histogram_and_otsu(original_image, binary_image, threshold_value):
-    # A figure is created and shown with 3 subplots
+    # A figure is created and shown with 3 subplots TODO ask how this figure creation works.
     plt.figure(figsize=(8, 3.2))
     original_image_axes(original_image)
     intensity_histogram(original_image, threshold_value)
     binary_otsu_image(binary_image)
+    # implementation of validation plots TODO link to main/ ask how it can be done.
     val.creation_of_control_image_subplot()
     val.creation_of_match_subplot(binary_image)
 
