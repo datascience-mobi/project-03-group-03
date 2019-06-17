@@ -12,87 +12,97 @@ import re
 import os
 import numpy as np
 
+directory = "C:\\Users\\User\\Documents\\GitHub\\project-03-group-03\\BBC020_v1_outlines_nuclei"
+search_filter = re.compile(".*1h 1.*")
+
 
 def assemble_and_import_control_image(directory, name):
-    # A blank image - consisting of black pixels/zeros- is created
+    # A blank image - consisting of black pixels/zeros- is created. It serves as a base to add all images to.
     blank_image_to_add_to = np.zeros((1040, 1388))
 
-    # For loop walks through a given directory
+    # For loop walks through a given directory and takes all names fulfilling the criteria.
+    # TODO try something without for loop
     for root, dirs, files in os.walk(directory):
         for file in files:
             if name.match(file):
-                # It imports all files matching the name-criteria and adds them to the blank
+                # It imports all files matching the name-criteria and adds them to the blank.
                 image = skimage.io.imread(directory + "\\" + file, as_gray=True)
                 blank_image_to_add_to = np.add(blank_image_to_add_to, image)
 
+    # Final image with all nuclei added is binarized into an True False np array.
     binary_image = blank_image_to_add_to > 100
     return binary_image
 
 
-def original_image_axes(original_image):
-    # original_image_axes creates the first subplot in the first column of the figure.
-    # it shows the original image in gray scale. Axis labeling is turned off
-    plt.subplot(1, 3, 1)
-
-    plt.imshow(original_image, cmap=plt.cm.gray)
-    plt.title('Original')
-    plt.axis('off')
-
-
-def intensity_histogram(original_image, threshold_value):
-    # Histogram of the normalized intensity distribution is created at second column.
-    # A line indicating the Otsu threshold was added
-    plt.subplot(1, 3, 2)
-    plt.hist(original_image.ravel(), bins=256)
-    plt.title('Histogram')
-    plt.axvline(threshold_value, color='r', label='Threshold Value')
-    plt.legend()
-
-
-def binary_otsu_image(binary_image):
-    # The third subplot is showing the binary image after otsu thresholding. Again the axis labeling is turned off
-    plt.subplot()
-    plt.imshow(binary_image, cmap=plt.cm.gray)
-    plt.axis('off')
-
-
-def dice_coefficient(binary_image, binary_control):
-
+def creation_of_match_array(binary_image, binary_control):
+    # Function compares two arrays and returns an array where differences are set False and matches True.
     control = binary_control
     image = binary_image
     match = np.array(control == image)
     return match
 
 
-def figure_of_control(binary_image):
+def dice_score(binary_original, binary_control):
+    #
+    # figure_of_control(binary_control, 'Optimal given threshold')
+    match = creation_of_match_array(binary_original, binary_control)
+    # figure_of_control(match, 'deviation of optimal threshold and otsu')
+    true = sum(sum(match))
+    false = np.size(match) - true
+    score = 2 * true / (2 * true + false)
+    print("True hits ", true)
+    print("False hits ", false)
+    print("Dice score ", score)
+
+
+def binary_otsu_image(binary_image, title):
+    # The third subplot is showing the binary image after otsu thresholding. Again the axis labeling is turned off
+    plt.subplot()
+    plt.imshow(binary_image, cmap=plt.cm.gray)
+    plt.title(title)
+    plt.axis('off')
+
+
+def creation_of_control_image_subplot():
+
+    control_image = assemble_and_import_control_image(directory, search_filter)
+    plt.subplot(2, 3, 4)
+    plt.imshow(control_image, cmap=plt.cm.gray)
+    plt.title('optimal threshold')
+    plt.axis('off')
+    #binary_otsu_image(control_image, 'Optimal given threshold')
+
+
+def creation_of_match_subplot(binary_original):
+
+    control_image = assemble_and_import_control_image(directory, search_filter)
+    match = creation_of_match_array(binary_original, control_image)
+    plt.subplot(2, 3, 5)
+    plt.imshow(match, cmap=plt.cm.gray)
+    plt.title('deviation in black')
+    plt.axis('off')
+
+
+
+def figure_of_control(binary_image, title):
     # A figure is created and shown with 3 subplots
 
-    plt.figure(figsize=(3, 3))
-    binary_otsu_image(binary_image)
+    plt.figure(figsize=(3, 3.2))
+    binary_otsu_image(binary_image, title)
     plt.show()
 
-def main():
-    # Directory where the sub-controle
-    directory = "C:\\Users\\User\\Documents\\GitHub\\project-03-group-03\\BBC020_v1_outlines_nuclei"
-    # scuht nach allem in der klammer
 
-    blank_image_to_add_t = np.zeros((1040, 1388))
-    image = blank_image_to_add_t > 100
-    search_filter = re.compile(".*1h 1.*")
+def main(image):
+    # Directory where the sub-controle
+
+
+    # blank_image_to_add_t = np.zeros((1040, 1388))
+    # image = blank_image_to_add_t > 100
 
     control_image = assemble_and_import_control_image(directory, search_filter)
 
-    # figure_of_control(control_image)
-    match = dice_coefficient(image, control_image)
-    # figure_of_control(match)
-    true = sum(sum(match))
-    false = np.size(match) - true
-    dice_score = 2*true/(2*true+false)
-    print("True hits ", true)
-    print("False hits ", false)
-    print("Dice score ", dice_score)
+    dice_score(image, control_image)
+
 
 if __name__ == "__main__":
     main()
-
-

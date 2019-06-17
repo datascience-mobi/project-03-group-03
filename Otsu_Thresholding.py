@@ -8,6 +8,7 @@ Global Otsu thresholding
 import matplotlib.pyplot as plt
 import skimage.io
 import skimage.filters
+import valuation as val
 
 
 def import_image(path, name):
@@ -20,7 +21,7 @@ def import_image(path, name):
 def original_image_axes(original_image):
     # original_image_axes creates the first subplot in the first column of the figure.
     # it shows the original image in gray scale. Axis labeling is turned off
-    plt.subplot(1, 3, 1)
+    plt.subplot(2, 3, 1)
 
     plt.imshow(original_image, cmap=plt.cm.gray)
     plt.title('Original')
@@ -30,7 +31,7 @@ def original_image_axes(original_image):
 def intensity_histogram(original_image, threshold_value):
     # Histogram of the normalized intensity distribution is created at second column.
     # A line indicating the Otsu threshold was added
-    plt.subplot(1, 3, 2)
+    plt.subplot(2, 3, 2)
     plt.hist(original_image.ravel(), bins=256)
     plt.title('Histogram')
     plt.axvline(threshold_value, color='r', label='Threshold Value')
@@ -39,7 +40,7 @@ def intensity_histogram(original_image, threshold_value):
 
 def binary_otsu_image(binary_image):
     # The third subplot is showing the binary image after otsu thresholding. Again the axis labeling is turned off
-    plt.subplot(1, 3, 3)
+    plt.subplot(2, 3, 3)
     plt.imshow(binary_image, cmap=plt.cm.gray)
     plt.title('Thresholded')
     plt.axis('off')
@@ -47,12 +48,12 @@ def binary_otsu_image(binary_image):
 
 def figure_of_original_histogram_and_otsu(original_image, binary_image, threshold_value):
     # A figure is created and shown with 3 subplots
-
-    plt.figure(figsize=(8, 2.5))
-
+    plt.figure(figsize=(8, 3.2))
     original_image_axes(original_image)
     intensity_histogram(original_image, threshold_value)
     binary_otsu_image(binary_image)
+    val.creation_of_control_image_subplot()
+    val.creation_of_match_subplot(binary_image)
 
     plt.show()
 
@@ -69,6 +70,7 @@ def main():
     # image is binarized(False = black, True = white) and final figure is created
     binary = image > thresh
     figure_of_original_histogram_and_otsu(image, binary, thresh)
+    val.main(binary)
 
 
 if __name__ == "__main__":
