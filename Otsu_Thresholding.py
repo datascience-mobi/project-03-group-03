@@ -8,14 +8,10 @@ Global Otsu thresholding
 import matplotlib.pyplot as plt
 import skimage.io
 import skimage.filters
-import valuation as val
-
-
-def import_image(path, name):
-    # data/image is found in directory and imported as gray scale image
-    raw_image_path = path + "\\" + name
-    image = skimage.io.imread(raw_image_path, as_gray=True)
-    return image
+import dice as dic
+import get_im as im
+import os
+import re
 
 
 def original_image_axes(original_image):
@@ -66,7 +62,7 @@ def main():
 
     # import function was executed and optimal threshold value is determined by skimage
 
-    image = import_image(path, name)
+    image = im.import_image(image_path, name)
     thresh = skimage.filters.threshold_otsu(image)
     # image is binarized(False = black, True = white) and final figure is created
     binary = image > thresh
