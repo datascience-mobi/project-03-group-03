@@ -1,4 +1,4 @@
-## -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Created on Wed May  1 11:08:50 2019
 Global Otsu thresholding
@@ -17,12 +17,13 @@ def figure_of_original_histogram_and_otsu\
                 (original_image, binary_image, threshold_value, control_directory, search_filter, name):
     """
     A figure is created and shown with 6 subplots
-    :param original_image: image is shown
-    :param binary_image:
-    :param threshold_value:
-    :param control_directory:
-    :param search_filter:
-    :return:
+    :param original_image: untreated image is placed
+    :param binary_image: the optimal value of the threshold is added
+    :param threshold_value: image after otsu thresholding is placed
+    :param control_directory: directory where control images are found
+    :param search_filter: name criteria for images contributing to the control image
+    :param name: name of original/chose file is added as title
+    :return: a figure wuth six subplots original, histogram, thresholded, optimal, matches and dice score
     """
 
     binary_control = im.assemble_and_import_control_image(control_directory, search_filter)
@@ -35,7 +36,7 @@ def figure_of_original_histogram_and_otsu\
     axes[0][0].set_title('Original: ' + name)
     axes[0][0].axis('off')
 
-    axes[0][1].hist(original_image.ravel(), bins=256)
+    axes[0][1].hist(original_image.ravel(), bins=256) # TODO ask for normalization/scaling
     axes[0][1].set_title('Intensity Histogram')
     axes[0][1].axvline(threshold_value, color='r', label='Threshold Value')
     axes[0][1].legend()
@@ -64,6 +65,7 @@ def main():
     name = "jw-1h 1_c5.TIF"  # zB.jw-1h 2_c5.TIF , jw-1h 3_c5.TIF , jw-Kontrolle1_c5.TIF
     image_path = "all images\\BBBC020_v1_images\\" + name[:-7]
     control_path = "all controls\\BBC020_v1_outlines_nuclei\\"
+    # TODO change directory methodology
     search_filter = re.compile(name[:-4]+".*")
     control = 'BBBC020_v1_outlines_nuclei.ZIP'
     testing = 'BBBC020_v1_images.ZIP'
@@ -76,8 +78,7 @@ def main():
     # image is binarized(False = black, True = white) and final figure is created
     binary = image > thresh
     figure_of_original_histogram_and_otsu(image, binary, thresh, control_path, search_filter, name)
-    #dic.main(binary, control_path, search_filter)
-
+    # dic.main(binary, control_path, search_filter)
 
 
 if __name__ == "__main__":

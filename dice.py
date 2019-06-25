@@ -35,8 +35,8 @@ def dice_score(binary_image, binary_control):
     true = sum(sum(match))
     false = np.size(match) - true
     score = 2 * true / (2 * true + false)
-    #print("True hits: ", true)
-    #print("False hits: ", false)
+    # print("True hits: ", true)
+    # print("False hits: ", false)
     print("Dice score: ", score)
     return 'Dice score: ', score
 
