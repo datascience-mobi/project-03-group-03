@@ -10,7 +10,6 @@ import skimage.io
 import skimage.filters
 import dice as dic
 import get_im as im
-import os
 import re
 
 
