@@ -94,7 +94,7 @@ def main():
         for name in files:
             image_path = os.path.join(root, name)
             if image_path[-7:] == "_c5.TIF":
-                print(image_path)
+                # print(image_path)
                 image = skimage.io.imread(image_path, as_gray=True)
                 control_path = "all controls/BBC020_v1_outlines_nuclei/"
                 # TODO change directory methodology
