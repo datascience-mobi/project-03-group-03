@@ -11,10 +11,11 @@ import skimage.filters
 import dice as dic
 import get_im as im
 import re
+import os
 
 
-def figure_of_original_histogram_and_otsu\
-                (original_image, binary_image, threshold_value, control_directory, search_filter, name):
+def figure_of_original_histogram_and_otsu(original_image, binary_image, threshold_value, control_directory,
+                                          search_filter, name):
     """
     A figure is created and shown with 6 subplots
     :param original_image: untreated image is placed
@@ -36,7 +37,7 @@ def figure_of_original_histogram_and_otsu\
     axes[0][0].set_title('Original: ' + name)
     axes[0][0].axis('off')
 
-    axes[0][1].hist(original_image.ravel(), bins=256) # TODO ask for normalization/scaling
+    axes[0][1].hist(original_image.ravel(), bins=256)  # TODO ask for normalization/scaling
     axes[0][1].set_title('Intensity Histogram')
     axes[0][1].axvline(threshold_value, color='r', label='Threshold Value')
     axes[0][1].legend()
@@ -60,10 +61,11 @@ def figure_of_original_histogram_and_otsu\
 
 
 def main():
-
+    """
     # Directory and image were defined
-    name = "jw-1h 1_c5.TIF"  # zB.jw-1h 2_c5.TIF , jw-1h 3_c5.TIF , jw-Kontrolle1_c5.TIF
-    image_path = "all images\\BBBC020_v1_images\\" + name[:-7]
+    name = "jw-1h 5_c5.TIF"  # zB.jw-1h 2_c5.TIF , jw-1h 3_c5.TIF , jw-Kontrolle1_c5.TIF
+    image_directory = "all images\\BBBC020_v1_images\\" + name[:-7]
+
     control_path = "all controls\\BBC020_v1_outlines_nuclei\\"
     # TODO change directory methodology
     search_filter = re.compile(name[:-4]+".*")
@@ -73,12 +75,35 @@ def main():
     im.create_image_files_if_there_are_no(testing)
     # import function was executed and optimal threshold value is determined by skimage
 
-    image = im.import_image(image_path, name)
+    image = im.import_image(image_directory, name)
     thresh = skimage.filters.threshold_otsu(image)
     # image is binarized(False = black, True = white) and final figure is created
     binary = image > thresh
     figure_of_original_histogram_and_otsu(image, binary, thresh, control_path, search_filter, name)
-    # dic.main(binary, control_path, search_filter)
+    dic.main(binary, control_path, search_filter)
+    """
+    # Directory and image were defined
+    # name = re.compile("jw-1h 2_c5.TIF")  # zB.jw-1h 2_c5.TIF , jw-1h 3_c5.TIF , jw-Kontrolle1_c5.TIF
+    image_directory = "all images/BBBC020_v1_images/"
+    control = 'BBBC020_v1_outlines_nuclei.ZIP'
+    testing = 'BBBC020_v1_images.ZIP'
+    im.create_control_files_if_there_are_no(control)
+    im.create_image_files_if_there_are_no(testing)
+
+    for root, dirs, files in os.walk(image_directory, topdown=False):
+        for name in files:
+            image_path = os.path.join(root, name)
+            if image_path[-7:] == "_c5.TIF":
+                print(image_path)
+                image = skimage.io.imread(image_path, as_gray=True)
+                control_path = "all controls/BBC020_v1_outlines_nuclei/"
+                # TODO change directory methodology
+                search_filter = re.compile(name[:-4] + ".*")
+
+                thresh = skimage.filters.threshold_otsu(image)
+                binary = image > thresh
+                figure_of_original_histogram_and_otsu(image, binary, thresh, control_path, search_filter, name)
+                # dic.main(binary, control_path, search_filter)
 
 
 if __name__ == "__main__":

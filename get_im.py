@@ -19,7 +19,7 @@ def import_image(path, name):
     :param name: name of image to open. all control data derives from that
     :return: the image that is examined
     """
-    raw_image_path = path + "\\" + name
+    raw_image_path = path + "/" + name
     image = skimage.io.imread(raw_image_path, as_gray=True)
     return image
 
@@ -40,7 +40,7 @@ def assemble_and_import_control_image(directory, name):
     for root, dirs, files in os.walk(directory):
         for file in files:
             if name.match(file):
-                image = skimage.io.imread(directory + "\\" + file, as_gray=True)
+                image = skimage.io.imread(directory + "/" + file, as_gray=True)
                 blank_image_to_add_to = np.add(blank_image_to_add_to, image)
 
     binary_image = blank_image_to_add_to > 100
@@ -55,7 +55,7 @@ def create_control_files_if_there_are_no(zipped):
     :return: an folder with unzipped images
     """
     cwd = os.getcwd()  # current working directory is taken
-    existing = os.path.exists(cwd + '\\' + 'all controls')
+    existing = os.path.exists(cwd + '/' + 'all controls')
 
     if not existing:
         zf = zipfile.ZipFile(zipped, 'r')
@@ -72,7 +72,7 @@ def create_image_files_if_there_are_no(zipped):
     """
     #
     cwd = os.getcwd()  # current working directory is taken
-    existing = os.path.exists(cwd+'\\'+'all images')
+    existing = os.path.exists(cwd+'/'+'all images')
 
     if not existing:
         zf = zipfile.ZipFile(zipped, 'r')
