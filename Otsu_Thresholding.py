@@ -58,34 +58,21 @@ def figure_of_original_histogram_and_otsu(original_image, binary_image, threshol
     axes[2][1].axis('off')
 
     plt.show()
+    pass
 
 
 def main():
-
-    # Directory and image were defined
-    # name = "jw-1h 5_c5.TIF"  # zB.jw-1h 2_c5.TIF , jw-1h 3_c5.TIF , jw-Kontrolle1_c5.TIF
-    # image_directory = "all images\\BBBC020_v1_images\\" + name[:-7]
-
-
-    # TODO change directory methodology
 
     control = 'BBBC020_v1_outlines_nuclei.ZIP'
     testing = 'BBBC020_v1_images.ZIP'
     im.create_control_files_if_there_are_no(control)
     im.create_image_files_if_there_are_no(testing)
-    # import function was executed and optimal threshold value is determined by skimage
-
-
-    # figure_of_original_histogram_and_otsu(image, binary, thresh, control_directory, search_filter, name)
-    # dic.main(binary, control_directory, search_filter)
-
-    # Directory and image were defined
-    # name = re.compile("jw-1h 2_c5.TIF")  # zB.jw-1h 2_c5.TIF , jw-1h 3_c5.TIF , jw-Kontrolle1_c5.TIF
     image_directory = "all images/BBBC020_v1_images/"
 
     path_list = []
     name_list = []
     score_list = []
+
     for root, dirs, files in os.walk(image_directory, topdown=False):
         for name in files:
             image_paths = os.path.join(root, name)
