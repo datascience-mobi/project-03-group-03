@@ -17,21 +17,24 @@ import os
 def figure_of_original_histogram_and_otsu(axes, y, original_image, binary_original, thresh_value, control_image,
                                           name, match_image, dice_score):
     """
-    A figure is created and shown with 6 subplots
+    A figure is created and shown with 6 subplots for y images
+    :param axes: axes for a figure defined in main
+    :param y: vertical position of axes in figure
     :param original_image: untreated image is placed
-    :param binary_image: the optimal value of the threshold is added
-    :param threshold_value: image after otsu thresholding is placed
-    :param control_directory: directory where control images are found
-    :param search_filter: name criteria for images contributing to the control image
-    :param name: name of original/chose file is added as title
-    :return: a figure wuth six subplots original, histogram, thresholded, optimal, matches and dice score
+    :param binary_original: the optimal value of the threshold is added
+    :param thresh_value: image after otsu thresholding is placed
+    :param control_image: the assembled given control is placed
+    :param name: the name of the seached image
+    :param match_image: the deviation overlay is placed
+    :param dice_score: a number repesenting the dice score is inserted
+    :return: six subplots original, histogram, thresholded, optimal, matches and dice score without a figure
     """
 
     axes[y][0].imshow(original_image, cmap=plt.cm.gray)
     axes[y][0].set_title('Original: ' + name)
     axes[y][0].axis('off')
 
-    axes[y][1].hist(original_image.ravel(), bins=256)  # TODO ask for normalization/scaling
+    axes[y][1].hist(original_image.ravel(), bins=256)
     axes[y][1].set_title('Intensity Histogram')
     axes[y][1].axvline(thresh_value, color='r', label='Threshold Value')
     axes[y][1].legend()
@@ -48,7 +51,7 @@ def figure_of_original_histogram_and_otsu(axes, y, original_image, binary_origin
     axes[y][4].set_title('deviation in black')
     axes[y][4].axis('off')
 
-    axes[y][5].text(0, 0.5, dice_score)  # TODO ugly, make nice
+    axes[y][5].text(0, 0.5, dice_score)  # TODO still ugly, make nice
     axes[y][5].axis('off')
 
 
@@ -67,14 +70,17 @@ def main():
     for root, dirs, files in os.walk(image_directory, topdown=False):
         for name in files:
             image_paths = os.path.join(root, name)  # join directory and namr to path
-            if image_paths[-7:] == "_c5.TIF":
+
+            # image paths fulfilling name_criteria are selected
+            name_criteria = "_c5.TIF"
+            length = len(name_criteria)
+            if image_paths[-length:] == name_criteria:  # if the last (length) digits fulfill name criteria -> move on
                 path_list.append(image_paths)
                 name_list.append(name)
 
     figure, axes = plt.subplots(25, 6, figsize=(20, 80))
 
     for idx, path in enumerate(path_list, 0):
-        # print(idx, path)
         print(idx, name_list[idx])
 
         control_search_filter = re.compile(name_list[idx][:-4]+".*")
@@ -84,18 +90,15 @@ def main():
         binary_original = original_image > thresh_value
         control_directory = "all controls/BBC020_v1_outlines_nuclei/"
         binary_control = im.assemble_and_import_control_image(control_directory, control_search_filter)
-        control_image = im.assemble_and_import_control_image(control_directory, control_search_filter)
         match_image = dic.creation_of_match_array(binary_original, binary_control)
         dice_score = dic.dice_score(binary_original, binary_control)
         score_list.append(dice_score)
-        figure_of_original_histogram_and_otsu(axes, idx, original_image, binary_original, thresh_value, control_image,
+        figure_of_original_histogram_and_otsu(axes, idx, original_image, binary_original, thresh_value, binary_control,
                                               name_list[idx], match_image, dice_score)
 
     plt.show()
-    # print(idx)
-    # print(score_list)
     total_dice_score = (sum(score_list))/(idx+1)
-    print(total_dice_score)
+    print('Total dice score: ', total_dice_score)
 
 
 if __name__ == "__main__":

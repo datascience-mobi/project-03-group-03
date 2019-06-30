@@ -16,7 +16,6 @@ def import_image(path):
     """
     data/image is found in directory and imported as gray scale image
     :param path: path where image can be found.
-    :param name: name of image to open. all control data derives from that
     :return: the image that is examined
     """
     raw_image_path = path
@@ -52,8 +51,10 @@ def create_unzipped_files_if_there_are_no(zipped, title):
     checking if unzipped images were already created im working directory.
     If not, it unzippes and creates it.
     :param zipped: an folder or file that needs to be absent to trigger this function
+    :param title: name of folder which is looked for or created
     :return: an folder with unzipped images
     """
+
     cwd = os.getcwd()  # current working directory is taken
     existing = os.path.exists(cwd + '/' + title)
 
@@ -61,4 +62,3 @@ def create_unzipped_files_if_there_are_no(zipped, title):
         zf = zipfile.ZipFile(zipped, 'r')
         zf.extractall(title)
         print('created', title, 'folder')
-

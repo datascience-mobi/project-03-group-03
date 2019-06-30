@@ -5,7 +5,6 @@ valuation of Otsu thresholding
 @author: Luis
 """
 
-import get_im as im
 import numpy as np
 
 
@@ -39,21 +38,3 @@ def dice_score(binary_image, binary_control):
     # print("False hits: ", false)
     print("Dice score: ", score)
     return score
-
-
-def dice_calculation(image, control_directory, search_filter):
-
-    # control_image = im.assemble_and_import_control_image(control_directory, search_filter)
-    # dice_score(image, control_image)
-    pass
-
-
-def main(image, control_directory, search_filter):
-    # control_directory = "C:\\Users\\User\\Documents\\GitHub\\project-03-group-03\\BBC020_v1_outlines_nuclei"
-    control_image = im.assemble_and_import_control_image(control_directory, search_filter)
-
-    dice_score(image, control_image)
-
-
-if __name__ == "__main__":
-    main()
