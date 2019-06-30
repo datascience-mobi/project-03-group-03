@@ -38,7 +38,7 @@ def dice_score(binary_image, binary_control):
     # print("True hits: ", true)
     # print("False hits: ", false)
     print("Dice score: ", score)
-    return 'Dice score: ', score
+    return score
 
 
 def dice_calculation(image, control_directory, search_filter):
