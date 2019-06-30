@@ -47,7 +47,7 @@ def assemble_and_import_control_image(directory, name):
     return binary_image
 
 
-def create_control_files_if_there_are_no(zipped):
+def create_unzipped_files_if_there_are_no(zipped, title):
     """
     checking if unzipped images were already created im working directory.
     If not, it unzippes and creates it.
@@ -55,27 +55,10 @@ def create_control_files_if_there_are_no(zipped):
     :return: an folder with unzipped images
     """
     cwd = os.getcwd()  # current working directory is taken
-    existing = os.path.exists(cwd + '/' + 'all controls')
+    existing = os.path.exists(cwd + '/' + title)
 
     if not existing:
         zf = zipfile.ZipFile(zipped, 'r')
-        zf.extractall('all controls')
-        print('created new control folder')
+        zf.extractall(title)
+        print('created', title, 'folder')
 
-
-def create_image_files_if_there_are_no(zipped):
-    """
-    checking if unzipped images were already created im working directory.
-    If not, it unzippes and creates it.
-    :param zipped: an folder or file that needs to be absent to trigger this function
-    :return: an folder with unzipped images
-    """
-    #
-    cwd = os.getcwd()  # current working directory is taken
-    existing = os.path.exists(cwd+'/'+'all images')
-
-    if not existing:
-        zf = zipfile.ZipFile(zipped, 'r')
-        zf.extractall('all images')
-
-        print('created new image folder')
