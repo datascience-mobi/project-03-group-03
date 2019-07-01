@@ -12,13 +12,12 @@ import zipfile
 import os
 
 
-def import_image(path):
+def import_image(raw_image_path):
     """
     data/image is found in directory and imported as gray scale image
-    :param path: path where image can be found.
+    :param raw_image_path: path where image can be found.
     :return: the image that is examined
     """
-    raw_image_path = path
     image = skimage.io.imread(raw_image_path, as_gray=True)
     return image
 

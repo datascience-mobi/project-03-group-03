@@ -78,7 +78,7 @@ def main():
                 path_list.append(image_paths)
                 name_list.append(name)
 
-    figure, axes = plt.subplots(25, 6, figsize=(20, 80))
+    figure, axes = plt.subplots(20, 6, figsize=(20, 60))
 
     for idx, path in enumerate(path_list, 0):
         print(idx, name_list[idx])
