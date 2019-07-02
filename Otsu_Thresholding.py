@@ -51,7 +51,7 @@ def figure_of_original_histogram_and_otsu(axes, y, original_image, binary_origin
     axes[y][4].set_title('deviation in black')
     axes[y][4].axis('off')
 
-    axes[y][5].text(0, 0.5, dice_score)  # TODO still ugly, make nice
+    axes[y][5].text(0, 0.5, 'Dice score: %f' % dice_score)
     axes[y][5].axis('off')
 
 
