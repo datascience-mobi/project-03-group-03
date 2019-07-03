@@ -51,7 +51,13 @@ def figure_of_original_histogram_and_otsu(axes, y, original_image, binary_origin
     axes[y][4].set_title('deviation in black')
     axes[y][4].axis('off')
 
-    axes[y][5].text(0, 0.5, 'Dice score: %f' % dice_score)
+    if dice_score >= 0.99:
+        c = 'green'
+    elif dice_score <= 0.97:
+        c = "red"
+    else:
+        c = "yellow"
+    axes[y][5].text(0, 0.5, f"Dice score: {round(dice_score, 4)}", fontsize=19, bbox=dict(facecolor=c, alpha=1.5))
     axes[y][5].axis('off')
 
 
@@ -97,7 +103,7 @@ def main():
                                               name_list[idx], match_image, dice_score)
 
     plt.show()
-    total_dice_score = (sum(score_list))/(idx+1)
+    total_dice_score = (sum(score_list))/len(path_list)
     print('Total dice score: ', total_dice_score)
 
 
