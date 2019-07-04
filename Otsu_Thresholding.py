@@ -10,24 +10,32 @@ import skimage.io
 import skimage.filters
 import dice as dic
 import get_im as im
+import local_otsu as loco
 import re
 import os
 
 
 def figure_of_original_histogram_and_otsu(axes, y, original_image, binary_original, thresh_value, control_image,
-                                          name, match_image, dice_score):
+                                          name, local_threshold, match_global, match_local, dice_score_global,
+                                          dice_score_local, score_increase, radius):
+
     """
     A figure is created and shown with 6 subplots for y images
-    :param axes: axes for a figure defined in main
-    :param y: vertical position of axes in figure
+    :param axes:  axes for a figure defined in main
+    :param y:  vertical position of axes in figure
     :param original_image: untreated image is placed
     :param binary_original: the optimal value of the threshold is added
     :param thresh_value: image after otsu thresholding is placed
     :param control_image: the assembled given control is placed
     :param name: the name of the seached image
-    :param match_image: the deviation overlay is placed
-    :param dice_score: a number repesenting the dice score is inserted
-    :return: six subplots original, histogram, thresholded, optimal, matches and dice score without a figure
+    :param local_threshold: an array with eache pixel's threschold
+    :param match_global: the deviation overlay of global otsu and optimum is placed
+    :param match_local: the deviation overlay local otsu and optimum is placed
+    :param dice_score_global: a number repesenting the dice score is inserted
+    :param dice_score_local: dice score of the local otsu approach
+    :param score_increase: local - global otsu
+    :param radius: the size the locus of local otsu should have
+    :return: six subplots original, histogram, global-thresholded, local-thresholded, optimal, matches of local and global and dice score without a figure
     """
 
     axes[y][0].imshow(original_image, cmap=plt.cm.gray)
@@ -43,22 +51,30 @@ def figure_of_original_histogram_and_otsu(axes, y, original_image, binary_origin
     axes[y][2].set_title('Global Otsu')
     axes[y][2].axis('off')
 
-    axes[y][3].imshow(control_image, cmap=plt.cm.gray)
-    axes[y][3].set_title('Optimal threshold')
+    axes[y][3].imshow(local_threshold, cmap=plt.cm.gray)
+    axes[y][3].set_title(f'local thresholding\n {radius}')
     axes[y][3].axis('off')
 
-    axes[y][4].imshow(match_image, cmap=plt.cm.gray)
-    axes[y][4].set_title('deviation in black')
+    axes[y][4].imshow(control_image, cmap=plt.cm.gray)
+    axes[y][4].set_title('Optimal threshold')
     axes[y][4].axis('off')
 
-    if dice_score >= 0.99:
+    axes[y][5].imshow(match_global, cmap=plt.cm.gray)
+    axes[y][5].set_title(f'deviation of global\n {dice_score_global}')
+    axes[y][5].axis('off')
+
+    axes[y][6].imshow(match_local, cmap=plt.cm.gray)
+    axes[y][6].set_title(f'deviation of local\n {dice_score_local}')
+    axes[y][6].axis('off')
+
+    if score_increase > 0:
         c = 'green'
-    elif dice_score <= 0.97:
+    elif score_increase < 0:
         c = "red"
     else:
         c = "yellow"
-    axes[y][5].text(0, 0.5, f"Dice score: {round(dice_score, 4)}", fontsize=19, bbox=dict(facecolor=c, alpha=1.5))
-    axes[y][5].axis('off')
+    axes[y][7].text(0, 0.5, f"Increase: {round(score_increase, 6)}", fontsize=19, bbox=dict(facecolor=c, alpha=1.5))
+    axes[y][7].axis('off')
 
 
 def main():
@@ -69,9 +85,10 @@ def main():
     im.create_unzipped_files_if_there_are_no(testing, 'all images')
     image_directory = "all images/BBBC020_v1_images/"
 
-    path_list = []
+    image_path_list = []
     name_list = []
-    score_list = []
+    global_score_list = []
+    local_score_list = []
 
     for root, dirs, files in os.walk(image_directory, topdown=False):
         for name in files:
@@ -81,12 +98,12 @@ def main():
             name_criteria = "_c5.TIF"
             length = len(name_criteria)
             if image_paths[-length:] == name_criteria:  # if the last (length) digits fulfill name criteria -> move on
-                path_list.append(image_paths)
+                image_path_list.append(image_paths)
                 name_list.append(name)
 
-    figure, axes = plt.subplots(20, 6, figsize=(20, 60))
+    figure, axes = plt.subplots(20, 8, figsize=(24, 100))
 
-    for idx, path in enumerate(path_list, 0):
+    for idx, path in enumerate(image_path_list, 0):
         print(idx, name_list[idx])
 
         control_search_filter = re.compile(name_list[idx][:-4]+".*")
@@ -96,15 +113,26 @@ def main():
         binary_original = original_image > thresh_value
         control_directory = "all controls/BBC020_v1_outlines_nuclei/"
         binary_control = im.assemble_and_import_control_image(control_directory, control_search_filter)
-        match_image = dic.creation_of_match_array(binary_original, binary_control)
-        dice_score = dic.dice_score(binary_original, binary_control)
-        score_list.append(dice_score)
+
+        radius = 500
+        local_otsu = loco.local_otsu(original_image, radius)
+
+        match_global = dic.creation_of_match_array(binary_original, binary_control)
+        match_local = dic.creation_of_match_array(local_otsu, binary_control)
+
+        dice_score_global = dic.dice_score(binary_original, binary_control)
+        dice_score_local = dic.dice_score(local_otsu, binary_control)
+        global_score_list.append(dice_score_global)
+        local_score_list.append(dice_score_local)
+        score_increase = dice_score_local-dice_score_global
+
         figure_of_original_histogram_and_otsu(axes, idx, original_image, binary_original, thresh_value, binary_control,
-                                              name_list[idx], match_image, dice_score)
+                                              name_list[idx], local_otsu, match_global, match_local, dice_score_global,
+                                              dice_score_local, score_increase, radius)
 
     plt.show()
-    total_dice_score = (sum(score_list))/len(path_list)
-    print('Total dice score: ', total_dice_score)
+    # total_dice_score = (sum(global_score_list))/len(image_path_list)
+    # print('Total dice score: ', total_dice_score)
 
 
 if __name__ == "__main__":
