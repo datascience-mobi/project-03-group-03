@@ -79,8 +79,8 @@ def figure_of_original_histogram_and_otsu(axes, y, original_image, binary_origin
 
 def main():
 
-    control = 'BBBC020_v1_outlines_nuclei.ZIP'
-    testing = 'BBBC020_v1_images.ZIP'
+    control = 'BBBC020_v1_outlines_nuclei.zip'
+    testing = 'BBBC020_v1_images.zip'
     im.create_unzipped_files_if_there_are_no(control, 'all controls')
     im.create_unzipped_files_if_there_are_no(testing, 'all images')
     image_directory = "all images/BBBC020_v1_images/"
@@ -101,7 +101,7 @@ def main():
                 image_path_list.append(image_paths)
                 name_list.append(name)
 
-    figure, axes = plt.subplots(20, 8, figsize=(24, 100))
+    figure, axes = plt.subplots(20, 8, figsize=(24, 60))
 
     for idx, path in enumerate(image_path_list, 0):
         print(idx, name_list[idx])
@@ -114,7 +114,7 @@ def main():
         control_directory = "all controls/BBC020_v1_outlines_nuclei/"
         binary_control = im.assemble_and_import_control_image(control_directory, control_search_filter)
 
-        radius = 500
+        radius = 1
         local_otsu = loco.local_otsu(original_image, radius)
 
         match_global = dic.creation_of_match_array(binary_original, binary_control)
@@ -131,8 +131,8 @@ def main():
                                               dice_score_local, score_increase, radius)
 
     plt.show()
-    # total_dice_score = (sum(global_score_list))/len(image_path_list)
-    # print('Total dice score: ', total_dice_score)
+    total_dice_score = (sum(global_score_list))/len(global_score_list)
+    print('Total dice score: ', total_dice_score)
 
 
 if __name__ == "__main__":

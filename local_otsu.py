@@ -14,6 +14,12 @@ matplotlib.rcParams['font.size'] = 9
 
 
 def local_otsu(image, radius):
+    """
+
+    :param image: input image(original)
+    :param radius: size of disc- shaped mask for local otsu
+    :return: local thresholded image (and maybe the mask)
+    """
 
     img = img_as_ubyte(image)
 

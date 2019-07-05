@@ -44,6 +44,16 @@ def figure_of_original_histogram_and_otsu(axes, binary_original, control_image, 
 
 
 def x_axis_plots(axes, y, x, match_local, score_increase, radius):
+    """
+
+    :param axes: axes for a figure defined in main
+    :param y: vertical position of axes in figure
+    :param x: horizontal position of axes in figure
+    :param match_local: the deviation overlay between control images and local thresholded is placed
+    :param score_increase: local - global otsu
+    :param radius: the size the locus of local otsu should have
+    :return: subplots with match image dice score and colour background depending on in- decrease
+    """
 
     if score_increase > 0:
         c = 'green'
@@ -58,13 +68,13 @@ def x_axis_plots(axes, y, x, match_local, score_increase, radius):
     axes[x].axis('off')
 
 
-def figure_of_different_disc_size():
-
-    control = 'BBBC020_v1_outlines_nuclei.ZIP'
-    testing = 'BBBC020_v1_images.ZIP'
-    im.create_unzipped_files_if_there_are_no(control, 'all controls')
-    im.create_unzipped_files_if_there_are_no(testing, 'all images')
-    image_directory = "all images/BBBC020_v1_images/"
+def figure_of_different_disc_size(image_directory, control_directory):
+    """
+    created all parameters for figure with imported subplots
+    :param image_directory: directory where the images can be found
+    :param control_directory: directory where the controls can be found
+    :return: a figure with the thresholds of global and optimal and the matches/scores of different radii
+    """
 
     path_list = []
     name_list = []
@@ -93,7 +103,7 @@ def figure_of_different_disc_size():
         thresh_value = skimage.filters.threshold_otsu(original_image)
         # image is binarized(False = black, True = white) and final figure is created
         binary_original = original_image > thresh_value
-        control_directory = "all controls/BBC020_v1_outlines_nuclei/"
+
         binary_control = im.assemble_and_import_control_image(control_directory, control_search_filter)
 
         match_global = dic.creation_of_match_array(binary_original, binary_control)
@@ -121,53 +131,71 @@ def figure_of_different_disc_size():
 
 def main():
 
-    figure_of_different_disc_size()
-    radius_list = np.append([5], np.arange(10, 200, 10))
-
-    control = 'BBBC020_v1_outlines_nuclei.ZIP'
-    testing = 'BBBC020_v1_images.ZIP'
+    control = 'BBBC020_v1_outlines_nuclei.zip'
+    testing = 'BBBC020_v1_images.zip'
     im.create_unzipped_files_if_there_are_no(control, 'all controls')
     im.create_unzipped_files_if_there_are_no(testing, 'all images')
     image_directory = "all images/BBBC020_v1_images/"
+    control_directory = "all controls/BBC020_v1_outlines_nuclei/"
+
+    # figure_of_different_disc_size(image_directory, control_directory)
+    radius_list = np.arange(30, 60, 3)
 
     path_list = []
     name_list = []
     # global_score_list = []
-    # local_mean_score_list = []
+    local_mean_score_list = []
 
     for root, dirs, files in os.walk(image_directory, topdown=False):
         for name in files:
-            image_paths = os.path.join(root, name)  # join directory and namr to path
+            image_paths = os.path.join(root, name)  # join directory and name to path
 
             # image paths fulfilling name_criteria are selected
-            name_criteria = "1_c5.TIF"
+            name_criteria = "_c5.TIF"
             length = len(name_criteria)
             if image_paths[-length:] == name_criteria:  # if the last (length) digits fulfill name criteria -> move on
                 path_list.append(image_paths)
                 name_list.append(name)
-    local_mean_score_list = []
+
     for dx, radius in enumerate(radius_list, 0):
         current_score_list = []
+        print(radius)
         for idx, path in enumerate(path_list, 0):
 
             print(idx, name_list[idx])
 
             control_search_filter = re.compile(name_list[idx][:-4] + ".*")
             original_image = im.import_image(path)
+            # thresh_value = skimage.filters.threshold_otsu(original_image)
 
-            control_directory = "all controls/BBC020_v1_outlines_nuclei/"
-            binary_control = im.assemble_and_import_control_image(control_directory, control_search_filter)
             local_otsu = loco.local_otsu(original_image, radius)
+
+            # binary_original = original_image > thresh_value
+
+            binary_control = im.assemble_and_import_control_image(control_directory, control_search_filter)
+
+            # match_global = dic.creation_of_match_array(binary_original, binary_control)
+
+            # dice_score_global = dic.dice_score(binary_original, binary_control)
+
+            # global_score_list.append(dice_score_global)
 
             dice_score_local = dic.dice_score(local_otsu, binary_control)
 
             current_score_list.append(dice_score_local)
 
         local_mean_score_list.append(sum(current_score_list)/len(current_score_list))
-    plt.show()
 
     print(local_mean_score_list)
-    plt.plot(radius_list, local_mean_score_list)
+
+    # radius_list = np.array([1, 2, 3])
+    # local_mean_score_list = np.array([0.9, 0.99, 0.98])
+    plt.plot(radius_list, local_mean_score_list, 'g-', linewidth=2)
+    global_otsu_mean = 0.9847390203373723
+    plt.axhline(y=global_otsu_mean, color='r', linestyle='--', linewidth=1)
+    plt.title('radius dependent dice score')
+    plt.xlabel('disc radius')
+    plt.ylabel('dice score')
     plt.show()
 
 
