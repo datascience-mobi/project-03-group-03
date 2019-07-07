@@ -10,7 +10,7 @@ import skimage.io
 import skimage.filters
 import dice as dic
 import get_im as im
-import local_otsu as loco
+import enhance as loco
 import re
 import os
 
@@ -35,7 +35,8 @@ def figure_of_original_histogram_and_otsu(axes, y, original_image, binary_origin
     :param dice_score_local: dice score of the local otsu approach
     :param score_increase: local - global otsu
     :param radius: the size the locus of local otsu should have
-    :return: six subplots original, histogram, global-thresholded, local-thresholded, optimal, matches of local and global and dice score without a figure
+    :return: six subplots original, histogram, global-thresholded, local-thresholded, optimal,
+             matches of local and global and dice score without a figure
     """
 
     axes[y][0].imshow(original_image, cmap=plt.cm.gray)
