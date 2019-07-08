@@ -71,12 +71,12 @@ def x_axis_plots(axes, match_local, score_increase, radius):
     :return: subplots with match image dice score and colour background depending on in- decrease
     """
 
-    if score_increase > 0:
+    if score_increase > 0:  # TODO modularize
         c = 'green'
     elif score_increase < 0:
-        c = "red"
+        c = 'red'
     else:
-        c = "yellow"
+        c = 'yellow'
 
     axes[7].imshow(match_local, cmap=plt.cm.gray)
     axes[7].set_title(f'{radius}\n {round(score_increase, 6)}', fontsize=15, bbox=dict(facecolor=c, alpha=1.5))
@@ -96,12 +96,12 @@ def figure_of_different_disc_size(image_directory, control_directory):
     global_score_list = []
     # local_score_list = []
 
-    for root, dirs, files in os.walk(image_directory, topdown=False):
+    for root, dirs, files in os.walk(image_directory, topdown=False):  # TODO modularize
         for name in files:
             image_paths = os.path.join(root, name)  # join directory and namr to path
 
             # image paths fulfilling name_criteria are selected
-            name_criteria = "1h 1_c5.TIF"
+            name_criteria = '1h 1_c5.TIF'
             length = len(name_criteria)
             if image_paths[-length:] == name_criteria:  # if the last (length) digits fulfill name criteria -> move on
                 path_list.append(image_paths)
@@ -113,7 +113,7 @@ def figure_of_different_disc_size(image_directory, control_directory):
 
         print(idx, name_list[idx])
 
-        control_search_filter = re.compile(name_list[idx][:-4] + ".*")
+        control_search_filter = re.compile(name_list[idx][:-4] + '.*')
         original_image = im.import_image(path)
         original_image = img_as_ubyte(original_image)
         thresh_value = skimage.filters.threshold_otsu(original_image)
@@ -160,8 +160,8 @@ def main():
     testing = 'BBBC020_v1_images.zip'
     im.create_unzipped_files_if_there_are_no(control, 'all controls')
     im.create_unzipped_files_if_there_are_no(testing, 'all images')
-    image_directory = "all images/BBBC020_v1_images/"
-    control_directory = "all controls/BBC020_v1_outlines_nuclei/"
+    image_directory = 'all images/BBBC020_v1_images/'
+    control_directory = 'all controls/BBC020_v1_outlines_nuclei/'
 
     # figure_of_different_disc_size(image_directory, control_directory)
 
@@ -170,27 +170,27 @@ def main():
     path_list = []
     name_list = []
     # global_score_list = []
-    global_mean_score_list = []
+    mean_score_after_edging = []
 
     for root, dirs, files in os.walk(image_directory, topdown=False):
         for name in files:
             image_paths = os.path.join(root, name)  # join directory and name to path
 
             # image paths fulfilling name_criteria are selected
-            name_criteria = "_c5.TIF"
+            name_criteria = '_c5.TIF'
             length = len(name_criteria)
             if image_paths[-length:] == name_criteria:  # if the last (length) digits fulfill name criteria -> move on
                 path_list.append(image_paths)
                 name_list.append(name)
 
-    for dx, radius in enumerate(radius_list, 0):
+    for dx, radius in enumerate(radius_list):
         current_score_list = []
         print(radius)
-        for idx, path in enumerate(path_list, 0):
+        for idx, path in enumerate(path_list):
 
             print(idx, name_list[idx])
 
-            control_search_filter = re.compile(name_list[idx][:-4] + ".*")
+            control_search_filter = re.compile(name_list[idx][:-4] + '.*')
             original_image = im.import_image(path)
             # original_image = img_as_ubyte(original_image)
             original_image = enh.median_filter(original_image)
@@ -208,21 +208,25 @@ def main():
 
             current_score_list.append(dice_score_global)
 
-        global_mean_score_list.append(sum(current_score_list)/len(current_score_list))
+        mean_score_after_edging.append(sum(current_score_list)/len(current_score_list))
 
-    print(global_mean_score_list)
+    print(mean_score_after_edging)
 
     # radius_list = np.array([1, 2, 3])
-    # global_mean_score_list = np.array([0.9, 0.99, 0.98])
-    plt.plot(radius_list, global_mean_score_list, 'go-', linewidth=2)
-    global_otsu_mean = 0.9847390203373723
-    plt.axhline(y=global_otsu_mean, color='r', linestyle='--', linewidth=1, label='Total dice score')
-    plt.legend()
-    plt.title('sigma dependent dice score')
-    plt.xlabel('sigma')
-    plt.ylabel('dice score')
+    # mean_score_after_edging = np.array([0.9, 0.99, 0.98])
+    global_otsu_mean = 0.9847390203373723  # as list for compatibility with mean score afteredging
+    score_increase = mean_score_after_edging[0]-global_otsu_mean
+    if score_increase > 0:  # TODO modularize
+        c = 'green'
+    elif score_increase < 0:
+        c = 'red'
+    else:
+        c = 'yellow'
+
+    plt.text(0, 0.5, f'Increase:\n {round(score_increase, 6)}', fontsize=19, bbox=dict(facecolor=c, alpha=1.5))
+    plt.axis('off')
     plt.show()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

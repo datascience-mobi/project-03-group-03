@@ -61,20 +61,20 @@ def figure_of_original_histogram_and_otsu(axes, y, original_image, binary_origin
     axes[y][4].axis('off')
 
     axes[y][5].imshow(match_global, cmap=plt.cm.gray)
-    axes[y][5].set_title(f'deviation of global\n {dice_score_global}')
+    axes[y][5].set_title(f'deviation of global\n {round(dice_score_global), 6}')
     axes[y][5].axis('off')
 
     axes[y][6].imshow(match_local, cmap=plt.cm.gray)
-    axes[y][6].set_title(f'deviation of local\n {dice_score_local}')
+    axes[y][6].set_title(f'deviation of local\n {round(dice_score_local, 6)}')
     axes[y][6].axis('off')
 
-    if score_increase > 0:
+    if score_increase > 0:  # TODO modularize
         c = 'green'
     elif score_increase < 0:
-        c = "red"
+        c = 'red'
     else:
-        c = "yellow"
-    axes[y][7].text(0, 0.5, f"Increase: {round(score_increase, 6)}", fontsize=19, bbox=dict(facecolor=c, alpha=1.5))
+        c = 'yellow'
+    axes[y][7].text(0, 0.5, f'Increase: {round(score_increase, 6)}', fontsize=19, bbox=dict(facecolor=c, alpha=1.5))
     axes[y][7].axis('off')
 
 
@@ -84,19 +84,19 @@ def main():
     testing = 'BBBC020_v1_images.zip'
     im.create_unzipped_files_if_there_are_no(control, 'all controls')
     im.create_unzipped_files_if_there_are_no(testing, 'all images')
-    image_directory = "all images/BBBC020_v1_images/"
+    image_directory = 'all images/BBBC020_v1_images/'
 
     image_path_list = []
     name_list = []
     global_score_list = []
     local_score_list = []
 
-    for root, dirs, files in os.walk(image_directory, topdown=False):
+    for root, dirs, files in os.walk(image_directory, topdown=False):  # TODO modularize
         for name in files:
             image_paths = os.path.join(root, name)  # join directory and namr to path
 
             # image paths fulfilling name_criteria are selected
-            name_criteria = "_c5.TIF"
+            name_criteria = '_c5.TIF'
             length = len(name_criteria)
             if image_paths[-length:] == name_criteria:  # if the last (length) digits fulfill name criteria -> move on
                 image_path_list.append(image_paths)
@@ -107,15 +107,15 @@ def main():
     for idx, path in enumerate(image_path_list, 0):
         print(idx, name_list[idx])
 
-        control_search_filter = re.compile(name_list[idx][:-4]+".*")
+        control_search_filter = re.compile(name_list[idx][:-4]+'.*')
         original_image = im.import_image(path)
         thresh_value = skimage.filters.threshold_otsu(original_image)
         # image is binarized(False = black, True = white) and final figure is created
         binary_original = original_image > thresh_value
-        control_directory = "all controls/BBC020_v1_outlines_nuclei/"
+        control_directory = 'all controls/BBC020_v1_outlines_nuclei/'
         binary_control = im.assemble_and_import_control_image(control_directory, control_search_filter)
 
-        radius = 1
+        radius = 45
         local_otsu = loco.local_otsu(original_image, radius)
 
         match_global = dic.creation_of_match_array(binary_original, binary_control)
@@ -136,5 +136,5 @@ def main():
     print('Total dice score: ', total_dice_score)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
