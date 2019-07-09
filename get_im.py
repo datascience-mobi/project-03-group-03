@@ -64,6 +64,12 @@ def create_unzipped_files_if_there_are_no(zipped, title):
 
 
 def image_path_name_list(image_directory, name_criteria):
+    """
+
+    :param image_directory: the directory the loop is searching in
+    :param name_criteria: paths matching this criteria are selected
+    :return: two lists: all maching file names and their paths
+    """
 
     path_list = []
     name_list = []
