@@ -12,7 +12,6 @@ import dice as dic
 import get_im as im
 import enhance as enh
 import re
-import os
 
 
 def figure_of_original_histogram_and_otsu(axes, y, original_image, binary_original, thresh_value, control_image,
@@ -83,25 +82,15 @@ def main():
     im.create_unzipped_files_if_there_are_no(testing, 'all images')
     image_directory = 'all images/BBBC020_v1_images/'
 
-    image_path_list = []
-    name_list = []
     global_score_list = []
     local_score_list = []
 
-    for root, dirs, files in os.walk(image_directory, topdown=False):  # TODO modularize
-        for name in files:
-            image_paths = os.path.join(root, name)  # join directory and namr to path
-
-            # image paths fulfilling name_criteria are selected
-            name_criteria = '_c5.TIF'
-            length = len(name_criteria)
-            if image_paths[-length:] == name_criteria:  # if the last (length) digits fulfill name criteria -> move on
-                image_path_list.append(image_paths)
-                name_list.append(name)
+    path_list, name_list = im.image_path_name_list(image_directory, '_c5.TIF')
+    # generates a list of all paths and names of searched images
 
     figure, axes = plt.subplots(20, 8, figsize=(24, 60))
 
-    for idx, path in enumerate(image_path_list, 0):
+    for idx, path in enumerate(path_list, 0):
         print(idx, name_list[idx])
 
         control_search_filter = re.compile(name_list[idx][:-4]+'.*')

@@ -12,7 +12,6 @@ import dice as dic
 import get_im as im
 import enhance as enh
 import re
-import os
 
 
 def figure_of_original_histogram_and_otsu(axes, binary_original, control_image, match_global, dice_score_global):
@@ -66,21 +65,11 @@ def figure_of_different_disc_size(image_directory, control_directory):
     :return: a figure with the thresholds of global and optimal and the matches/scores of different radii
     """
 
-    path_list = []
-    name_list = []
     global_score_list = []
     # local_score_list = []
 
-    for root, dirs, files in os.walk(image_directory, topdown=False):  # TODO modularize
-        for name in files:
-            image_paths = os.path.join(root, name)  # join directory and namr to path
-
-            # image paths fulfilling name_criteria are selected
-            name_criteria = '24h 1_c5.TIF'
-            length = len(name_criteria)
-            if image_paths[-length:] == name_criteria:  # if the last (length) digits fulfill name criteria -> move on
-                path_list.append(image_paths)
-                name_list.append(name)
+    path_list, name_list = im.image_path_name_list(image_directory, '24h 1_c5.TIF')
+    # generates a list of all paths and names of searched images
 
     figure, axes = plt.subplots(1, 7, figsize=(30, 10))
 
@@ -129,21 +118,11 @@ def main():
     # radius_list = np.concatenate((10, 25, np.arange(30, 65, 5), 75, 100, 150, 300, 900), axis=None)
     radius_list = np.arange(40, 51, 1)
 
-    path_list = []
-    name_list = []
     # global_score_list = []
     local_mean_score_list = []
 
-    for root, dirs, files in os.walk(image_directory, topdown=False):  # TODO modularize
-        for name in files:
-            image_paths = os.path.join(root, name)  # join directory and name to path
-
-            # image paths fulfilling name_criteria are selected
-            name_criteria = '_c5.TIF'
-            length = len(name_criteria)
-            if image_paths[-length:] == name_criteria:  # if the last (length) digits fulfill name criteria -> move on
-                path_list.append(image_paths)
-                name_list.append(name)
+    path_list, name_list = im.image_path_name_list(image_directory, '_c5.TIF')
+    # generates a list of all paths and names of searched images
 
     for dx, radius in enumerate(radius_list, 0):
         current_score_list = []

@@ -76,7 +76,7 @@ def colour_indication(score_increase):
     :return: a colour regarding the sign
     """
 
-    if score_increase > 0:  # TODO modularize
+    if score_increase > 0:
         colour = 'green'
     elif score_increase < 0:
         colour = 'red'

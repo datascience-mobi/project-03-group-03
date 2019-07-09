@@ -61,3 +61,22 @@ def create_unzipped_files_if_there_are_no(zipped, title):
         zf = zipfile.ZipFile(zipped, 'r')
         zf.extractall(title)
         print('created', title, 'folder')
+
+
+def image_path_name_list(image_directory, name_criteria):
+
+    path_list = []
+    name_list = []
+
+    for root, dirs, files in os.walk(image_directory, topdown=False):
+        for name in files:
+            image_paths = os.path.join(root, name)  # join directory and namr to path
+
+            # image paths fulfilling name_criteria are selected
+            # name_criteria = '24h 1_c5.TIF'
+            length = len(name_criteria)
+            if image_paths[-length:] == name_criteria:  # if the last (length) digits fulfill name criteria -> move on
+                path_list.append(image_paths)
+                name_list.append(name)
+
+    return path_list, name_list
