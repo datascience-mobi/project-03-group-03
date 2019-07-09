@@ -51,15 +51,10 @@ def x_axis_plots(axes, x, match_local, score_increase, radius):
     :return: subplots with match image dice score and colour background depending on in- decrease
     """
 
-    if score_increase > 0:  # TODO modularize
-        c = 'green'
-    elif score_increase < 0:
-        c = 'red'
-    else:
-        c = 'yellow'
+    colour = enh.colour_indication(score_increase)
 
     axes[x].imshow(match_local, cmap=plt.cm.gray)
-    axes[x].set_title(f'{radius}\n {round(score_increase, 6)}', fontsize=15, bbox=dict(facecolor=c, alpha=1.5))
+    axes[x].set_title(f'{radius}\n {round(score_increase, 6)}', fontsize=15, bbox=dict(facecolor=colour, alpha=1.5))
     axes[x].axis('off')
 
 

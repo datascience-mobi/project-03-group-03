@@ -71,15 +71,10 @@ def x_axis_plots(axes, match_local, score_increase, radius):
     :return: subplots with match image dice score and colour background depending on in- decrease
     """
 
-    if score_increase > 0:  # TODO modularize
-        c = 'green'
-    elif score_increase < 0:
-        c = 'red'
-    else:
-        c = 'yellow'
+    colour = enh.colour_indication(score_increase)
 
     axes[7].imshow(match_local, cmap=plt.cm.gray)
-    axes[7].set_title(f'{radius}\n {round(score_increase, 6)}', fontsize=15, bbox=dict(facecolor=c, alpha=1.5))
+    axes[7].set_title(f'{radius}\n {round(score_increase, 6)}', fontsize=15, bbox=dict(facecolor=colour, alpha=1.5))
     axes[7].axis('off')
 
 
@@ -216,14 +211,10 @@ def main():
     # mean_score_after_edging = np.array([0.9, 0.99, 0.98])
     global_otsu_mean = 0.9847390203373723  # as list for compatibility with mean score afteredging
     score_increase = mean_score_after_edging[0]-global_otsu_mean
-    if score_increase > 0:  # TODO modularize
-        c = 'green'
-    elif score_increase < 0:
-        c = 'red'
-    else:
-        c = 'yellow'
 
-    plt.text(0, 0.5, f'Increase:\n {round(score_increase, 6)}', fontsize=19, bbox=dict(facecolor=c, alpha=1.5))
+    colour = enh.colour_indication(score_increase)
+
+    plt.text(0, 0.5, f'Increase:\n {round(score_increase, 6)}', fontsize=19, bbox=dict(facecolor=colour, alpha=1.5))
     plt.axis('off')
     plt.show()
 

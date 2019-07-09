@@ -10,7 +10,7 @@ import skimage.io
 import skimage.filters
 import dice as dic
 import get_im as im
-import enhance as loco
+import enhance as enh
 import re
 import os
 
@@ -68,13 +68,10 @@ def figure_of_original_histogram_and_otsu(axes, y, original_image, binary_origin
     axes[y][6].set_title(f'deviation of local\n {round(dice_score_local, 6)}')
     axes[y][6].axis('off')
 
-    if score_increase > 0:  # TODO modularize
-        c = 'green'
-    elif score_increase < 0:
-        c = 'red'
-    else:
-        c = 'yellow'
-    axes[y][7].text(0, 0.5, f'Increase: {round(score_increase, 6)}', fontsize=19, bbox=dict(facecolor=c, alpha=1.5))
+    colour = enh.colour_indication(score_increase)
+
+    axes[y][7].text(0, 0.5, f'Increase: {round(score_increase, 6)}', fontsize=19, bbox=dict(facecolor=colour,
+                                                                                            alpha=1.5))
     axes[y][7].axis('off')
 
 
@@ -116,7 +113,7 @@ def main():
         binary_control = im.assemble_and_import_control_image(control_directory, control_search_filter)
 
         radius = 45
-        local_otsu = loco.local_otsu(original_image, radius)
+        local_otsu = enh.local_otsu(original_image, radius)
 
         match_global = dic.creation_of_match_array(binary_original, binary_control)
         match_local = dic.creation_of_match_array(local_otsu, binary_control)

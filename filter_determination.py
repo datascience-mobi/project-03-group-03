@@ -51,15 +51,10 @@ def x_axis_plots(axes, x, match_local, score_increase, radius):
     :return: subplots with match image dice score and colour background depending on in- decrease
     """
 
-    if score_increase > 0:  # TODO modularize
-        c = 'green'
-    elif score_increase < 0:
-        c = 'red'
-    else:
-        c = 'yellow'
+    colour = enh.colour_indication(score_increase)
 
     axes[x].imshow(match_local, cmap=plt.cm.gray)
-    axes[x].set_title(f'{radius}\n {round(score_increase, 6)}', fontsize=15, bbox=dict(facecolor=c, alpha=1.5))
+    axes[x].set_title(f'{radius}\n {round(score_increase, 6)}', fontsize=15, bbox=dict(facecolor=colour, alpha=1.5))
     axes[x].axis('off')
 
 
@@ -135,7 +130,7 @@ def main():
     image_directory = 'all images/BBBC020_v1_images/'
     control_directory = 'all controls/BBC020_v1_outlines_nuclei/'
 
-    # figure_of_different_disc_size(image_directory, control_directory)
+    figure_of_different_disc_size(image_directory, control_directory)
     radius_list = np.array([0.28, 0.282, 0.285, 0.288])
 
     path_list = []
@@ -148,7 +143,7 @@ def main():
             image_paths = os.path.join(root, name)  # join directory and name to path
 
             # image paths fulfilling name_criteria are selected
-            name_criteria = "_c5.TIF"
+            name_criteria = "1_c5.TIF"
             length = len(name_criteria)
             if image_paths[-length:] == name_criteria:  # if the last (length) digits fulfill name criteria -> move on
                 path_list.append(image_paths)

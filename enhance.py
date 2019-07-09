@@ -67,3 +67,20 @@ def sobel_edge_detection(image_path):
 
     sobel_image = sk.filters.sobel(img)
     return sobel_image
+
+
+def colour_indication(score_increase):
+    """
+
+    :param score_increase: a number being >, < or = 0
+    :return: a colour regarding the sign
+    """
+
+    if score_increase > 0:  # TODO modularize
+        colour = 'green'
+    elif score_increase < 0:
+        colour = 'red'
+    else:
+        colour = 'yellow'
+
+    return colour
