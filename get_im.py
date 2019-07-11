@@ -22,7 +22,7 @@ def import_image(raw_image_path):
     return image
 
 
-def assemble_and_import_control_image(directory, name):
+def assemble_import_control_image(directory, name):
     """
     A blank image - consisting of black pixels/zeros- is created. It serves as a base to add all images to.
     For loop walks through a given directory and takes all names fulfilling the criteria.

@@ -14,7 +14,7 @@ import enhance as enh
 import re
 
 
-def figure_of_original_histogram_and_otsu(axes, binary_original, control_image, match_global, dice_score_global):
+def axes_otsu_match(axes, binary_original, control_image, match_global, dice_score_global):
     """
     A figure is created and shown with 6 subplots for y images
     :param axes: axes for a figure defined in main
@@ -57,7 +57,7 @@ def x_axis_plots(axes, x, match_local, score_increase, radius):
     axes[x].axis('off')
 
 
-def figure_of_different_disc_size(image_directory, control_directory):
+def fig_dif_mask_size(image_directory, control_directory):
     """
     created all parameters for figure with imported subplots
     :param image_directory: directory where the images can be found
@@ -81,15 +81,15 @@ def figure_of_different_disc_size(image_directory, control_directory):
         thresh_value = skimage.filters.threshold_otsu(original_image)
         # image is binarized(False = black, True = white) and final figure is created
         binary_original = original_image > thresh_value
-        binary_control = im.assemble_and_import_control_image(control_directory, control_search_filter)
+        binary_control = im.assemble_import_control_image(control_directory, control_search_filter)
 
         match_global = dic.creation_of_match_array(binary_original, binary_control)
         dice_score_global = dic.dice_score(binary_original, binary_control)
         global_score_list.append(dice_score_global)
         # local_score_list.append(dice_score_local)
 
-        figure_of_original_histogram_and_otsu(axes, binary_original, binary_control, match_global,
-                                              dice_score_global)
+        axes_otsu_match(axes, binary_original, binary_control, match_global,
+                        dice_score_global)
 
         radius_list = np.array([0.28, 0.282, 0.285, 5])
         for dx, radius in enumerate(radius_list, 3):
@@ -110,7 +110,7 @@ def figure_of_different_disc_size(image_directory, control_directory):
     print('Total dice score: ', total_dice_score)
 
 
-def main():
+def display_improve_filter():
 
     control = 'BBBC020_v1_outlines_nuclei.zip'
     testing = 'BBBC020_v1_images.zip'
@@ -119,8 +119,8 @@ def main():
     image_directory = 'all images/BBBC020_v1_images/'
     control_directory = 'all controls/BBC020_v1_outlines_nuclei/'
 
-    figure_of_different_disc_size(image_directory, control_directory)
-    radius_list = np.array([0.28, 0.282, 0.285, 0.288])
+    fig_dif_mask_size(image_directory, control_directory)
+    radius_list = np.array([0.25, 0.5, 1, 2, 3, 4, 5, 7, 10])
 
     # global_score_list = []
     global_mean_score_list = []
@@ -137,7 +137,7 @@ def main():
 
             control_search_filter = re.compile(name_list[idx][:-4] + '.*')
             original_image = im.import_image(path)
-            binary_control = im.assemble_and_import_control_image(control_directory, control_search_filter)
+            binary_control = im.assemble_import_control_image(control_directory, control_search_filter)
 
             # local_otsu = loco.local_otsu(original_image, radius)
             gauss_filtered_image = enh.gaussian_filter(original_image, radius)
@@ -165,4 +165,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    display_improve_filter()

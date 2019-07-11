@@ -14,9 +14,9 @@ import enhance as enh
 import re
 
 
-def figure_of_original_histogram_and_otsu(axes, y, original_image, binary_original, thresh_value, control_image,
-                                          name, local_threshold, match_global, match_local, dice_score_global,
-                                          dice_score_local, score_increase, radius):
+def axes_original_hist_otsus(axes, y, original_image, binary_original, thresh_value, control_image,
+                             name, local_threshold, match_global, match_local, dice_score_global,
+                             dice_score_local, score_increase, radius):
 
     """
     A figure is created and shown with 6 subplots for y images
@@ -99,7 +99,7 @@ def main():
         # image is binarized(False = black, True = white) and final figure is created
         binary_original = original_image > thresh_value
         control_directory = 'all controls/BBC020_v1_outlines_nuclei/'
-        binary_control = im.assemble_and_import_control_image(control_directory, control_search_filter)
+        binary_control = im.assemble_import_control_image(control_directory, control_search_filter)
 
         radius = 45
         local_otsu = enh.local_otsu(original_image, radius)
@@ -113,9 +113,9 @@ def main():
         local_score_list.append(dice_score_local)
         score_increase = dice_score_local-dice_score_global
 
-        figure_of_original_histogram_and_otsu(axes, idx, original_image, binary_original, thresh_value, binary_control,
-                                              name_list[idx], local_otsu, match_global, match_local, dice_score_global,
-                                              dice_score_local, score_increase, radius)
+        axes_original_hist_otsus(axes, idx, original_image, binary_original, thresh_value, binary_control,
+                                 name_list[idx], local_otsu, match_global, match_local, dice_score_global,
+                                 dice_score_local, score_increase, radius)
 
     plt.show()
     total_dice_score = (sum(global_score_list))/len(global_score_list)

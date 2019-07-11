@@ -86,21 +86,10 @@ def figure_of_different_disc_size(image_directory, control_directory):
     :return: a figure with the thresholds of global and optimal and the matches/scores of different radii
     """
 
-    path_list = []
-    name_list = []
     global_score_list = []
     # local_score_list = []
 
-    for root, dirs, files in os.walk(image_directory, topdown=False):  # TODO modularize
-        for name in files:
-            image_paths = os.path.join(root, name)  # join directory and namr to path
-
-            # image paths fulfilling name_criteria are selected
-            name_criteria = '1h 1_c5.TIF'
-            length = len(name_criteria)
-            if image_paths[-length:] == name_criteria:  # if the last (length) digits fulfill name criteria -> move on
-                path_list.append(image_paths)
-                name_list.append(name)
+    path_list, name_list = im.image_path_name_list(image_directory, '1h 1_c5.TIF')
 
     figure, axes = plt.subplots(1, 8, figsize=(30, 10))
 
@@ -115,7 +104,7 @@ def figure_of_different_disc_size(image_directory, control_directory):
         # image is binarized(False = black, True = white) and final figure is created
         binary_original = original_image > thresh_value
 
-        binary_control = im.assemble_and_import_control_image(control_directory, control_search_filter)
+        binary_control = im.assemble_import_control_image(control_directory, control_search_filter)
 
         match_global = dic.creation_of_match_array(binary_original, binary_control)
 
@@ -149,7 +138,7 @@ def figure_of_different_disc_size(image_directory, control_directory):
     print('Total dice score: ', total_dice_score)
 
 
-def main():
+def increase_add_edge():
 
     control = 'BBBC020_v1_outlines_nuclei.zip'
     testing = 'BBBC020_v1_images.zip'
@@ -162,21 +151,10 @@ def main():
 
     radius_list = np.array([1])
 
-    path_list = []
-    name_list = []
     # global_score_list = []
     mean_score_after_edging = []
 
-    for root, dirs, files in os.walk(image_directory, topdown=False):
-        for name in files:
-            image_paths = os.path.join(root, name)  # join directory and name to path
-
-            # image paths fulfilling name_criteria are selected
-            name_criteria = '_c5.TIF'
-            length = len(name_criteria)
-            if image_paths[-length:] == name_criteria:  # if the last (length) digits fulfill name criteria -> move on
-                path_list.append(image_paths)
-                name_list.append(name)
+    path_list, name_list = im.image_path_name_list(image_directory, '_c5.TIF')
 
     for dx, radius in enumerate(radius_list):
         current_score_list = []
@@ -197,7 +175,7 @@ def main():
             sobel_thresh_value = skimage.filters.threshold_otsu(original_merge_edge)
             binary_sobel = original_merge_edge > sobel_thresh_value
 
-            binary_control = im.assemble_and_import_control_image(control_directory, control_search_filter)
+            binary_control = im.assemble_import_control_image(control_directory, control_search_filter)
 
             dice_score_global = dic.dice_score(binary_sobel, binary_control)
 
@@ -220,4 +198,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    increase_add_edge()
