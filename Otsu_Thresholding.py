@@ -11,12 +11,14 @@ import skimage.filters
 import dice as dic
 import get_im as im
 import enhance as enh
+
+from scipy import ndimage as ndi
 import re
 
 
 def axes_original_hist_otsus(axes, y, original_image, binary_original, thresh_value, control_image,
                              name, local_threshold, match_global, match_local, dice_score_global,
-                             dice_score_local, score_increase, radius):
+                             dice_score_local, score_increase, radius, global_count, local_count, op_count):
 
     """
     A figure is created and shown with 6 subplots for y images
@@ -69,8 +71,9 @@ def axes_original_hist_otsus(axes, y, original_image, binary_original, thresh_va
 
     colour = enh.colour_indication(score_increase)
 
-    axes[y][7].text(0, 0.5, f'Increase: {round(score_increase, 6)}', fontsize=19, bbox=dict(facecolor=colour,
+    axes[y][7].text(0, 0.9, f'Increase: {round(score_increase, 6)}', fontsize=19, bbox=dict(facecolor=colour,
                                                                                             alpha=1.5))
+    axes[y][7].text(0, 0.6, f'nuclei number\n Global: {global_count}\n Local: {local_count}\n Optimal: {op_count}')
     axes[y][7].axis('off')
 
 
@@ -85,7 +88,7 @@ def main():
     global_score_list = []
     local_score_list = []
 
-    path_list, name_list = im.image_path_name_list(image_directory, '_c5.TIF')
+    path_list, name_list = im.image_path_name_list(image_directory, ' 1_c5.TIF')
     # generates a list of all paths and names of searched images
 
     figure, axes = plt.subplots(20, 8, figsize=(24, 60))
@@ -99,13 +102,22 @@ def main():
         # image is binarized(False = black, True = white) and final figure is created
         binary_original = original_image > thresh_value
         control_directory = 'all controls/BBC020_v1_outlines_nuclei/'
-        binary_control = im.assemble_import_control_image(control_directory, control_search_filter)
+        binary_control, optimal_counter = im.assemble_import_control_image(control_directory, control_search_filter)
+
+        print('opimal nuclei;', optimal_counter)
 
         radius = 45
         local_otsu = enh.local_otsu(original_image, radius)
 
+        cleaned_original_image = enh.small_obj_deletion(original_image, 80)
+        g_segmented, global_count = ndi.label(cleaned_original_image)
         match_global = dic.creation_of_match_array(binary_original, binary_control)
+        print('global nuclei', global_count)
+
+        local_otsu = enh.small_obj_deletion(local_otsu, 900)  # small objects were erased
+        l_segmented, local_count = ndi.label(local_otsu)  # nuclei were marked and counted
         match_local = dic.creation_of_match_array(local_otsu, binary_control)
+        print('local nulei', local_count)
 
         dice_score_global = dic.dice_score(binary_original, binary_control)
         dice_score_local = dic.dice_score(local_otsu, binary_control)
@@ -115,7 +127,7 @@ def main():
 
         axes_original_hist_otsus(axes, idx, original_image, binary_original, thresh_value, binary_control,
                                  name_list[idx], local_otsu, match_global, match_local, dice_score_global,
-                                 dice_score_local, score_increase, radius)
+                                 dice_score_local, score_increase, radius, global_count, local_count, optimal_counter)
 
     plt.show()
     total_dice_score = (sum(global_score_list))/len(global_score_list)

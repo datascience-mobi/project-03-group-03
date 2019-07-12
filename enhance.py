@@ -9,6 +9,8 @@ import skimage as sk
 from skimage.morphology import disk
 from skimage.filters import rank
 from skimage.util import img_as_ubyte
+from scipy import ndimage as ndi
+import numpy as np
 
 
 def local_otsu(image, radius):
@@ -84,3 +86,13 @@ def colour_indication(score_increase):
         colour = 'yellow'
 
     return colour
+
+
+def small_obj_deletion(image, minimum):
+
+    label_objects, nb_labels = ndi.label(image)  # small objects were erased
+    sizes = np.bincount(label_objects.ravel())
+    mask_sizes = sizes > minimum
+    mask_sizes[0] = 0
+    clean_image = mask_sizes[label_objects]
+    return clean_image

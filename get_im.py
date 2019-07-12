@@ -32,17 +32,19 @@ def assemble_import_control_image(directory, name):
     :param name: the name that is searched for eache cycle
     :return: an image of all assembled images being thresholded/binarized
     """
-    #
+
     blank_image_to_add_to = np.zeros((1040, 1388))
-    #
+    counter_list = [0]
     for root, dirs, files in os.walk(directory):
         for file in files:
             if name.match(file):
                 image = skimage.io.imread(directory + "/" + file, as_gray=True)
                 blank_image_to_add_to = np.add(blank_image_to_add_to, image)
+                counter_list = np.add(counter_list, [1])
 
     binary_image = blank_image_to_add_to > 100
-    return binary_image
+    counter = counter_list[0]
+    return binary_image, counter
 
 
 def create_unzipped_files_if_there_are_no(zipped, title):
