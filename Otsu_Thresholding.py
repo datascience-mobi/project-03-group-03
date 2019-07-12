@@ -11,7 +11,7 @@ import skimage.filters
 import dice as dic
 import get_im as im
 import enhance as enh
-
+from skimage.color import label2rgb
 from scipy import ndimage as ndi
 import re
 
@@ -54,7 +54,7 @@ def axes_original_hist_otsus(axes, y, original_image, binary_original, thresh_va
     axes[y][2].axis('off')
 
     axes[y][3].imshow(local_threshold, cmap=plt.cm.gray)
-    axes[y][3].set_title(f'local thresholding\n {radius}')
+    axes[y][3].set_title(f'local thresholding {radius}\n segmented')
     axes[y][3].axis('off')
 
     axes[y][4].imshow(control_image, cmap=plt.cm.gray)
@@ -62,7 +62,7 @@ def axes_original_hist_otsus(axes, y, original_image, binary_original, thresh_va
     axes[y][4].axis('off')
 
     axes[y][5].imshow(match_global, cmap=plt.cm.gray)
-    axes[y][5].set_title(f'deviation of global\n {round(dice_score_global), 6}')
+    axes[y][5].set_title(f'deviation of global\n {round(dice_score_global, 6)}')
     axes[y][5].axis('off')
 
     axes[y][6].imshow(match_local, cmap=plt.cm.gray)
@@ -88,7 +88,7 @@ def main():
     global_score_list = []
     local_score_list = []
 
-    path_list, name_list = im.image_path_name_list(image_directory, ' 1_c5.TIF')
+    path_list, name_list = im.image_path_name_list(image_directory, 'min 1_c5.TIF')
     # generates a list of all paths and names of searched images
 
     figure, axes = plt.subplots(20, 8, figsize=(24, 60))
@@ -104,20 +104,21 @@ def main():
         control_directory = 'all controls/BBC020_v1_outlines_nuclei/'
         binary_control, optimal_counter = im.assemble_import_control_image(control_directory, control_search_filter)
 
-        print('opimal nuclei;', optimal_counter)
+        print('opimal nuclei:', optimal_counter)
 
         radius = 45
         local_otsu = enh.local_otsu(original_image, radius)
 
-        cleaned_original_image = enh.small_obj_deletion(original_image, 80)
-        g_segmented, global_count = ndi.label(cleaned_original_image)
+        cleaned_original = enh.small_obj_deletion(binary_original, 800)  # small objects were erased
+        g_segmented, global_count = ndi.label(cleaned_original)  # nuclei were marked and counted
         match_global = dic.creation_of_match_array(binary_original, binary_control)
-        print('global nuclei', global_count)
+        print('global nuclei: ', global_count)
 
         local_otsu = enh.small_obj_deletion(local_otsu, 900)  # small objects were erased
         l_segmented, local_count = ndi.label(local_otsu)  # nuclei were marked and counted
         match_local = dic.creation_of_match_array(local_otsu, binary_control)
-        print('local nulei', local_count)
+        coloured_local = label2rgb(l_segmented, bg_label=0, bg_color=(0, 0, 0))
+        print('local nuclei: ', local_count)
 
         dice_score_global = dic.dice_score(binary_original, binary_control)
         dice_score_local = dic.dice_score(local_otsu, binary_control)
@@ -126,7 +127,7 @@ def main():
         score_increase = dice_score_local-dice_score_global
 
         axes_original_hist_otsus(axes, idx, original_image, binary_original, thresh_value, binary_control,
-                                 name_list[idx], local_otsu, match_global, match_local, dice_score_global,
+                                 name_list[idx], coloured_local, match_global, match_local, dice_score_global,
                                  dice_score_local, score_increase, radius, global_count, local_count, optimal_counter)
 
     plt.show()
