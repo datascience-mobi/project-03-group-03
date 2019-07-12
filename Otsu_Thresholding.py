@@ -28,14 +28,17 @@ def axes_original_hist_otsus(axes, y, original_image, binary_original, thresh_va
     :param binary_original: the optimal value of the threshold is added
     :param thresh_value: image after otsu thresholding is placed
     :param control_image: the assembled given control is placed
-    :param name: the name of the seached image
-    :param local_threshold: an array with eache pixel's threschold
+    :param name: the name of the searched image
+    :param local_threshold: an array with each pixel's threschold
     :param match_global: the deviation overlay of global otsu and optimum is placed
     :param match_local: the deviation overlay local otsu and optimum is placed
-    :param dice_score_global: a number repesenting the dice score is inserted
+    :param dice_score_global: a number representing the dice score is inserted
     :param dice_score_local: dice score of the local otsu approach
     :param score_increase: local - global otsu
     :param radius: the size the locus of local otsu should have
+    :param global_count: nuclei counts after global otsu
+    :param local_count: nuclei counts after local otsu
+    :param op_count: nuclei counts of given optimum
     :return: six subplots original, histogram, global-thresholded, local-thresholded, optimal,
              matches of local and global and dice score without a figure
     """
@@ -71,9 +74,10 @@ def axes_original_hist_otsus(axes, y, original_image, binary_original, thresh_va
 
     colour = enh.colour_indication(score_increase)
 
-    axes[y][7].text(0, 0.9, f'Increase: {round(score_increase, 6)}', fontsize=19, bbox=dict(facecolor=colour,
+    axes[y][7].text(0, 0.9, f'Increase by local:\n {round(score_increase, 6)}', fontsize=15, bbox=dict(facecolor=colour,
                                                                                             alpha=1.5))
-    axes[y][7].text(0, 0.6, f'nuclei number\n Global: {global_count}\n Local: {local_count}\n Optimal: {op_count}')
+    axes[y][7].text(0, 0.4, f'Nuclei number\n Global: {global_count}\n Local: {local_count}\n Optimal: {op_count}',
+                    fontsize=15)
     axes[y][7].axis('off')
 
 
@@ -88,7 +92,7 @@ def main():
     global_score_list = []
     local_score_list = []
 
-    path_list, name_list = im.image_path_name_list(image_directory, 'min 1_c5.TIF')
+    path_list, name_list = im.image_path_name_list(image_directory, '_c5.TIF')
     # generates a list of all paths and names of searched images
 
     figure, axes = plt.subplots(20, 8, figsize=(24, 60))
@@ -109,7 +113,7 @@ def main():
         radius = 45
         local_otsu = enh.local_otsu(original_image, radius)
 
-        cleaned_original = enh.small_obj_deletion(binary_original, 800)  # small objects were erased
+        cleaned_original = enh.small_obj_deletion(binary_original, 900)  # small objects were erased
         g_segmented, global_count = ndi.label(cleaned_original)  # nuclei were marked and counted
         match_global = dic.creation_of_match_array(binary_original, binary_control)
         print('global nuclei: ', global_count)

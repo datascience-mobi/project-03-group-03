@@ -89,6 +89,12 @@ def colour_indication(score_increase):
 
 
 def small_obj_deletion(image, minimum):
+    """
+
+    :param image: image/array to process
+    :param minimum: minimum object size to be not erased
+    :return: image/array without objects smaller minimum
+    """
 
     label_objects, nb_labels = ndi.label(image)  # small objects were erased
     sizes = np.bincount(label_objects.ravel())
