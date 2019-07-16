@@ -5,6 +5,7 @@ Global Otsu thresholding
 @author: Luis
 """
 
+import skimage as sk
 import matplotlib.pyplot as plt
 import skimage.io
 import skimage.filters
@@ -74,9 +75,9 @@ def axes_original_hist_otsus(axes, y, original_image, binary_original, thresh_va
 
     colour = enh.colour_indication(score_increase)
 
-    axes[y][7].text(0, 0.9, f'Increase by local:\n {round(score_increase, 6)}', fontsize=15, bbox=dict(facecolor=colour,
+    axes[y][7].text(0, 1, f'Increase by local:\n {round(score_increase, 6)}', fontsize=15, bbox=dict(facecolor=colour,
                                                                                             alpha=1.5))
-    axes[y][7].text(0, 0.4, f'Nuclei number\n Global: {global_count}\n Local: {local_count}\n Optimal: {op_count}',
+    axes[y][7].text(0, 0.2, f'Nuclei number\n Global: {global_count}\n Local: {local_count}\n Optimal: {op_count}',
                     fontsize=15)
     axes[y][7].axis('off')
 
@@ -88,6 +89,7 @@ def main():
     im.create_unzipped_files_if_there_are_no(control, 'all controls')
     im.create_unzipped_files_if_there_are_no(testing, 'all images')
     image_directory = 'all images/BBBC020_v1_images/'
+    control_directory = 'all controls/BBC020_v1_outlines_nuclei/'
 
     global_score_list = []
     local_score_list = []
@@ -95,34 +97,35 @@ def main():
     path_list, name_list = im.image_path_name_list(image_directory, '_c5.TIF')
     # generates a list of all paths and names of searched images
 
-    figure, axes = plt.subplots(20, 8, figsize=(24, 60))
+    figure, axes = plt.subplots(20, 8, figsize=(30, 50))
 
     for idx, path in enumerate(path_list, 0):
-        print(idx, name_list[idx])
+        # print(idx, name_list[idx])
 
         control_search_filter = re.compile(name_list[idx][:-4]+'.*')
         original_image = im.import_image(path)
+        # original_image = sk.img_as_ubyte(original_image)
         thresh_value = skimage.filters.threshold_otsu(original_image)
         # image is binarized(False = black, True = white) and final figure is created
         binary_original = original_image > thresh_value
-        control_directory = 'all controls/BBC020_v1_outlines_nuclei/'
         binary_control, optimal_counter = im.assemble_import_control_image(control_directory, control_search_filter)
 
-        print('opimal nuclei:', optimal_counter)
+        # print('opimal nuclei:', optimal_counter)
 
         radius = 45
-        local_otsu = enh.local_otsu(original_image, radius)
+        # original_image_filtered = enh.median_filter(original_image)
+        local_otsu, mask = enh.local_otsu(original_image, radius)
 
         cleaned_original = enh.small_obj_deletion(binary_original, 900)  # small objects were erased
         g_segmented, global_count = ndi.label(cleaned_original)  # nuclei were marked and counted
         match_global = dic.creation_of_match_array(binary_original, binary_control)
-        print('global nuclei: ', global_count)
+        # print('global nuclei: ', global_count)
 
         local_otsu = enh.small_obj_deletion(local_otsu, 900)  # small objects were erased
         l_segmented, local_count = ndi.label(local_otsu)  # nuclei were marked and counted
         match_local = dic.creation_of_match_array(local_otsu, binary_control)
         coloured_local = label2rgb(l_segmented, bg_label=0, bg_color=(0, 0, 0))
-        print('local nuclei: ', local_count)
+        # print('local nuclei: ', local_count)
 
         dice_score_global = dic.dice_score(binary_original, binary_control)
         dice_score_local = dic.dice_score(local_otsu, binary_control)

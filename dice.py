@@ -36,5 +36,5 @@ def dice_score(binary_image, binary_control):
     score = 2 * true / (2 * true + false)
     # print("True hits: ", true)
     # print("False hits: ", false)
-    print('Dice score: ', score)
+    # print('Dice score: ', score)
     return score

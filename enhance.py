@@ -28,7 +28,7 @@ def local_otsu(image, radius):
     local_otsu_mask = rank.otsu(img, selem)
     local_thresholded_image = img > local_otsu_mask
 
-    return local_thresholded_image
+    return local_thresholded_image, local_otsu_mask
 
 
 def gaussian_filter(image_path, sigma):
