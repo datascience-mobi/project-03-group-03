@@ -5,7 +5,6 @@ Global Otsu thresholding
 @author: Luis
 """
 
-import skimage as sk
 import matplotlib.pyplot as plt
 import skimage.io
 import skimage.filters
