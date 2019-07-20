@@ -49,7 +49,7 @@ def axes_original_hist_otsus(axes, y, original_image, binary_original, thresh_va
     axes[y][1].axis('off')
 
     axes[y][0].hist(original_image.ravel(), bins=256)
-    axes[y][0].set_ylim(ymax=20000)
+    axes[y][0].set_ylim(top=20000)
     axes[y][0].set_title('Intensity Histogram')
     axes[y][0].axvline(thresh_value, color='r', label='Threshold Value')
     axes[y][0].legend()
@@ -76,8 +76,8 @@ def axes_original_hist_otsus(axes, y, original_image, binary_original, thresh_va
 
     colour = enh.colour_indication(score_increase)
 
-    axes[y][7].text(0, 1, f'Increase by Local Otsu, Object Deletion :\n {round(score_increase, 6)}', fontsize=15, bbox=dict(facecolor=colour,
-                                                                                            alpha=1.5))
+    axes[y][7].text(0, 1, f'Increase by Local Otsu, Object Deletion :\n {round(score_increase, 6)}', fontsize=15,
+                    bbox=dict(facecolor=colour, alpha=1.5))
     axes[y][7].text(0, 0.2, f'Nuclei number\n Global: {global_count}\n Local: {local_count}\n Optimal: {op_count}',
                     fontsize=15)
     axes[y][7].axis('off')
