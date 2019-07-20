@@ -44,38 +44,39 @@ def axes_original_hist_otsus(axes, y, original_image, binary_original, thresh_va
              matches of local and global and dice score without a figure
     """
 
-    axes[y][0].imshow(original_image, cmap=plt.cm.gray)
-    axes[y][0].set_title('Original: ' + name)
-    axes[y][0].axis('off')
+    axes[y][1].imshow(original_image, cmap=plt.cm.gray)
+    axes[y][1].set_title('Original: ' + name)
+    axes[y][1].axis('off')
 
-    axes[y][1].hist(original_image.ravel(), bins=256)
-    axes[y][1].set_title('Intensity Histogram')
-    axes[y][1].axvline(thresh_value, color='r', label='Threshold Value')
-    axes[y][1].legend()
+    axes[y][0].hist(original_image.ravel(), bins=256)
+    axes[y][0].set_ylim(ymax=20000)
+    axes[y][0].set_title('Intensity Histogram')
+    axes[y][0].axvline(thresh_value, color='r', label='Threshold Value')
+    axes[y][0].legend()
 
     axes[y][2].imshow(binary_original, cmap=plt.cm.gray)
     axes[y][2].set_title('Global Otsu')
     axes[y][2].axis('off')
 
     axes[y][3].imshow(local_threshold, cmap=plt.cm.gray)
-    axes[y][3].set_title(f'local thresholding {radius}\n segmented')
+    axes[y][3].set_title(f'Local thresholding {radius}\n segmented')
     axes[y][3].axis('off')
 
     axes[y][4].imshow(control_image, cmap=plt.cm.gray)
-    axes[y][4].set_title('Optimal threshold')
+    axes[y][4].set_title('Ground Truth')
     axes[y][4].axis('off')
 
     axes[y][5].imshow(match_global, cmap=plt.cm.gray)
-    axes[y][5].set_title(f'deviation of global\n {round(dice_score_global, 6)}')
+    axes[y][5].set_title(f'Deviation with Global\n {round(dice_score_global, 6)}')
     axes[y][5].axis('off')
 
     axes[y][6].imshow(match_local, cmap=plt.cm.gray)
-    axes[y][6].set_title(f'deviation of local\n {round(dice_score_local, 6)}')
+    axes[y][6].set_title(f'Deviation with Local\n {round(dice_score_local, 6)}')
     axes[y][6].axis('off')
 
     colour = enh.colour_indication(score_increase)
 
-    axes[y][7].text(0, 1, f'Increase by local:\n {round(score_increase, 6)}', fontsize=15, bbox=dict(facecolor=colour,
+    axes[y][7].text(0, 1, f'Increase by Local Otsu, Object Deletion :\n {round(score_increase, 6)}', fontsize=15, bbox=dict(facecolor=colour,
                                                                                             alpha=1.5))
     axes[y][7].text(0, 0.2, f'Nuclei number\n Global: {global_count}\n Local: {local_count}\n Optimal: {op_count}',
                     fontsize=15)
@@ -97,7 +98,7 @@ def main():
     path_list, name_list = im.image_path_name_list(image_directory, '_c5.TIF')
     # generates a list of all paths and names of searched images
 
-    figure, axes = plt.subplots(20, 8, figsize=(30, 50))
+    figure, axes = plt.subplots(20, 8, figsize=(25, 50))
 
     for idx, path in enumerate(path_list, 0):
         # print(idx, name_list[idx])
@@ -113,8 +114,8 @@ def main():
         # print('opimal nuclei:', optimal_counter)
 
         radius = 45
-        # original_image_filtered = enh.median_filter(original_image)
-        local_otsu, mask = enh.local_otsu(original_image, radius)
+        original_image_filtered = enh.median_filter(original_image)
+        local_otsu, mask = enh.local_otsu(original_image_filtered, radius)
 
         cleaned_original = enh.small_obj_deletion(binary_original, 900)  # small objects were erased
         g_segmented, global_count = ndi.label(cleaned_original)  # nuclei were marked and counted
@@ -137,9 +138,12 @@ def main():
                                  name_list[idx], coloured_local, match_global, match_local, dice_score_global,
                                  dice_score_local, score_increase, radius, global_count, local_count, optimal_counter)
 
-    plt.show()
+    figure.tight_layout()
+    figure.show()
     total_dice_score = (sum(global_score_list))/len(global_score_list)
-    print('Total dice score: ', total_dice_score)
+    print('Average GlobalDice score: ', total_dice_score)
+    average_local_dice_score = (sum(local_score_list))/len(local_score_list)
+    print('Average Local Dice score: ', average_local_dice_score)
 
 
 if __name__ == '__main__':

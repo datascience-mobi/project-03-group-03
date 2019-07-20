@@ -35,7 +35,7 @@ def figure_of_original_edges_and_otsu(axes, binary_original, control_image, matc
     """
 
     axes[0][0].imshow(original_image, cmap=plt.cm.gray)
-    axes[0][0].set_title('Global Otsu', fontsize=19)
+    axes[0][0].set_title('Original', fontsize=19)
     axes[0][0].axis('off')
 
     axes[0][1].imshow(binary_original, cmap=plt.cm.gray)
@@ -43,23 +43,23 @@ def figure_of_original_edges_and_otsu(axes, binary_original, control_image, matc
     axes[0][1].axis('off')
 
     axes[0][2].imshow(control_image, cmap=plt.cm.gray)
-    axes[0][2].set_title('Optimal threshold', fontsize=19)
+    axes[0][2].set_title('Ground Truth', fontsize=19)
     axes[0][2].axis('off')
 
     axes[0][3].imshow(match_global, cmap=plt.cm.gray)
-    axes[0][3].set_title(f'deviation of global\n {dice_score_global}', fontsize=19)
+    axes[0][3].set_title(f'Deviation with Global\n {dice_score_global}', fontsize=19)
     axes[0][3].axis('off')
 
     axes[1][0].imshow(sobel_edged_image, cmap=plt.cm.gray)
-    axes[1][0].set_title(f'only edges', fontsize=19)
+    axes[1][0].set_title(f'Edges', fontsize=19)
     axes[1][0].axis('off')
 
     axes[1][1].imshow(original_merge_edge, cmap=plt.cm.gray)
-    axes[1][1].set_title(f'edge + image ', fontsize=19)
+    axes[1][1].set_title(f'Edge + Image ', fontsize=19)
     axes[1][1].axis('off')
 
     axes[1][2].imshow(binary_sobel, cmap=plt.cm.gray)
-    axes[1][2].set_title(f'thresh e+i', fontsize=19)
+    axes[1][2].set_title(f'Thresh E+I', fontsize=19)
     axes[1][2].axis('off')
 
     colour = enh.colour_indication(score_increase)
@@ -158,13 +158,13 @@ def increase_add_edge():
 
     mean_score_after_edging.append(sum(current_score_list)/len(current_score_list))
 
-    print('Dice score mean after overlaying the edges: ', mean_score_after_edging[0])
+    print('Dice score mean after overlaying the edges is ', mean_score_after_edging[0])
 
     # radius_list = np.array([1, 2, 3])
     # mean_score_after_edging = np.array([0.9, 0.99, 0.98])
     global_otsu_mean = 0.9847390203373723  # as list for compatibility with mean score afteredging
     score_increase = mean_score_after_edging[0]-global_otsu_mean
-    print('Dice score mean global: ', global_otsu_mean)
+    print('Average global Dice score : ', global_otsu_mean)
     print('Increase: ', score_increase)
 
 
@@ -279,7 +279,7 @@ def display_improve_gaussian_filter():
     control_directory = 'all controls/BBC020_v1_outlines_nuclei/'
 
     # fig_dif_mask_size(image_directory, control_directory)
-    radius_list = np.array([0.25, 0.5, 1, 2, 3, 4, 5, 7, 10])
+    radius_list = np.array([0.28, 0.3, 0.5, 1, 2, 3, 4, 5, 7])
 
     # global_score_list = []
     global_mean_score_list = []
@@ -315,11 +315,11 @@ def display_improve_gaussian_filter():
     # global_mean_score_list = np.array([0.9, 0.99, 0.98])
     plt.plot(radius_list, global_mean_score_list, 'g-', linewidth=2)
     global_otsu_mean = 0.9847390203373723
-    plt.axhline(y=global_otsu_mean, color='r', linestyle='--', linewidth=1, label='Total dice score')
+    plt.axhline(y=global_otsu_mean, color='r', linestyle='--', linewidth=1, label='Average Dice Score')
     plt.legend()
-    plt.title('sigma dependent dice score')
-    plt.xlabel('sigma')
-    plt.ylabel('dice score')
+    plt.title('Sigma Dependent Dice Score')
+    plt.xlabel('Sigma')
+    plt.ylabel('Dice Score')
     plt.show()
 
 
@@ -466,7 +466,8 @@ def optimal_local_otsu():
     control_directory = 'all controls/BBC020_v1_outlines_nuclei/'
 
     # fig_diff_local_size(image_directory, control_directory)
-    radius_list = np.concatenate((10, 25, np.arange(30, 55, 5), 60, 75, 100, 120, 150, 200, 300, 400, 600, 1000), axis=None)
+    radius_list = np.concatenate((10, 25, np.arange(30, 55, 5), 60, 75, 100, 120, 150, 200, 300, 400, 600, 1000),
+                                 axis=None)
     # radius_list = np.arange(150, 320, 20)
 
     # global_score_list = []
@@ -499,11 +500,11 @@ def optimal_local_otsu():
     # local_mean_score_list = np.array([0.9, 0.99, 0.98])
     plt.plot(radius_list, local_mean_score_list, 'g-', linewidth=2)
     global_otsu_mean = 0.9847390203373723
-    plt.axhline(y=global_otsu_mean, color='r', linestyle='--', linewidth=1, label='Total dice score')
+    plt.axhline(y=global_otsu_mean, color='r', linestyle='--', linewidth=1, label='Average Dice Score')
     plt.legend()
-    plt.title('radius dependent dice score')
-    plt.xlabel('disc radius')
-    plt.ylabel('dice score')
+    plt.title('Radius Dependent Dice Score')
+    plt.xlabel('Loci Radius')
+    plt.ylabel('Dice Score')
     plt.show()
 
 
