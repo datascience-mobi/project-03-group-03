@@ -140,9 +140,10 @@ def main():
     figure.tight_layout()
     figure.show()
     total_dice_score = (sum(global_score_list))/len(global_score_list)
-    print('Average GlobalDice score: ', total_dice_score)
+    print('Average Global Dice score: ', total_dice_score)
     average_local_dice_score = (sum(local_score_list))/len(local_score_list)
     print('Average Local Dice score: ', average_local_dice_score)
+    print('Average Increase with improvements ', average_local_dice_score-total_dice_score)
 
 
 if __name__ == '__main__':
